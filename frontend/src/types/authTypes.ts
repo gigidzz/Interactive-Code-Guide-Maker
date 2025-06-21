@@ -1,6 +1,6 @@
 export interface SignUpFormState {
-  firstName: string;
-  lastName: string;
+  name: string;
+  profession: string[];
   email: string;
   password: string;
   confirmPassword: string;
@@ -13,8 +13,8 @@ export interface LoginFormState {
 }
 
 export interface SignUpFormErrors {
-  firstName?: string;
-  lastName?: string;
+  name?: string;
+  profession?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
@@ -26,8 +26,8 @@ export interface LoginFormErrors {
 }
 
 export interface SignUpData {
-  firstName: string;
-  lastName: string;
+  name: string;
+  profession?: string[];
   email: string;
   password: string;
 }
