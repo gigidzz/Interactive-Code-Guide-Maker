@@ -6,11 +6,13 @@ import type { SignUpFormState, SignUpFormErrors } from '../types/authTypes';
 
 type FormAction =
   | { type: 'UPDATE_FIELD'; field: keyof SignUpFormState; value: string }
+  | { type: 'ADD_PROFESSION'; profession: string }
+  | { type: 'REMOVE_PROFESSION'; index: number }
   | { type: 'RESET_FORM' };
 
 const initialFormState: SignUpFormState = {
-  firstName: '',
-  lastName: '',
+  name: '',
+  profession: [],
   email: '',
   password: '',
   confirmPassword: ''
@@ -22,6 +24,16 @@ const formReducer = (state: SignUpFormState, action: FormAction): SignUpFormStat
       return {
         ...state,
         [action.field]: action.value
+      };
+    case 'ADD_PROFESSION':
+      return {
+        ...state,
+        profession: [...state.profession, action.profession]
+      };
+    case 'REMOVE_PROFESSION':
+      return {
+        ...state,
+        profession: state.profession.filter((_, index) => index !== action.index)
       };
     case 'RESET_FORM':
       return initialFormState;
@@ -35,6 +47,7 @@ const SignUp = () => {
   const [errors, setErrors] = useState<SignUpFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string>('');
+  const [professionInput, setProfessionInput] = useState<string>('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,14 +65,35 @@ const SignUp = () => {
     }
   };
 
+  const handleAddProfession = (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+    if (('key' in e && e.key === 'Enter') || e.type === 'click') {
+      e.preventDefault();
+      const trimmedProfession = professionInput.trim();
+      
+      if (trimmedProfession && !formState.profession.includes(trimmedProfession)) {
+        dispatch({ type: 'ADD_PROFESSION', profession: trimmedProfession });
+        setProfessionInput('');
+        
+        // Clear profession error if it exists
+        if (errors.profession) {
+          setErrors(prev => ({
+            ...prev,
+            profession: undefined
+          }));
+        }
+      }
+    }
+  };
+
+  const handleRemoveProfession = (index: number) => {
+    dispatch({ type: 'REMOVE_PROFESSION', index });
+  };
+
   const validateForm = (): boolean => {
     const newErrors: SignUpFormErrors = {};
 
-    if (!formState.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-    if (!formState.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+    if (!formState.name.trim()) {
+      newErrors.name = 'First name is required';
     }
     if (!formState.email.trim()) {
       newErrors.email = 'Email is required';
@@ -94,6 +128,7 @@ const SignUp = () => {
 
     if (result.success) {
       dispatch({ type: 'RESET_FORM' });
+      setProfessionInput('');
       console.log('Account created successfully:', result.data);
     } else {
       setApiError(result.message || 'Failed to create account');
@@ -128,51 +163,78 @@ const SignUp = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                   First name
                 </label>
                 <div className="mt-1">
                   <input
-                    id="firstName"
-                    name="firstName"
+                    id="name"
+                    name="name"
                     type="text"
                     required
-                    value={formState.firstName}
+                    value={formState.name}
                     onChange={handleInputChange}
                     className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.firstName ? 'border-red-300' : 'border-gray-300'
+                      errors.name ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="First name"
                   />
-                  {errors.firstName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
                   )}
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  Last name
-                </label>
-                <div className="mt-1">
+            <div>
+              <label htmlFor="profession" className="block text-sm font-medium text-gray-700">
+                Professions
+              </label>
+              <div className="mt-1">
+                <div className="flex gap-2">
                   <input
-                    id="lastName"
-                    name="lastName"
+                    id="profession"
+                    name="profession"
                     type="text"
-                    required
-                    value={formState.lastName}
-                    onChange={handleInputChange}
-                    className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.lastName ? 'border-red-300' : 'border-gray-300'
+                    value={professionInput}
+                    onChange={(e) => setProfessionInput(e.target.value)}
+                    onKeyDown={handleAddProfession}
+                    className={`appearance-none block flex-1 px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.profession ? 'border-red-300' : 'border-gray-300'
                     }`}
-                    placeholder="Last name"
+                    placeholder="Enter a profession"
                   />
-                  {errors.lastName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
-                  )}
+                  <button
+                    type="button"
+                    onClick={handleAddProfession}
+                    className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Add
+                  </button>
                 </div>
+                {errors.profession && (
+                  <p className="mt-1 text-sm text-red-600">{errors.profession}</p>
+                )}
+                
+                {formState.profession.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {formState.profession.map((prof, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-md"
+                      >
+                        {prof}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveProfession(index)}
+                          className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
