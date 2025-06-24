@@ -18,7 +18,6 @@ export interface Guide {
     created_at: Date;
   }
 
-  // Request/Response types
   export interface CreateGuideRequest {
     title: string;
     description: string;
@@ -32,3 +31,47 @@ export interface Guide {
     code_content?: string;
     language?: string;
   }
+
+  export interface UserExtraData {
+  name: string;
+  profilePicture?: string;
+  bio?: string;
+  profession?: string[];
+}
+
+export interface TempSignup {
+  email: string;
+  extra_data: UserExtraData;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface User {
+  id?: string;
+  email: string;
+  name: string;
+  profile_picture?: string;
+  bio?: string;
+  profession?: string[];
+}
+
+export interface SignupRequest {
+  email: string;
+  password: string;
+  name: string,
+  profession?: string[], 
+  bio?: string
+}
+
+export interface ConfirmRequest {
+  token_hash: string;
+  type: string;
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message: string;
+  data?: T;
+  error?: string;
+}
+
