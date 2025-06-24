@@ -1,86 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const ConfirmSignup: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const confirmSignup = async () => {
-      try {
-        const tokenHash = searchParams.get('token_hash');
-        const type = searchParams.get('type');
+    // Get status from URL parameters (set by backend redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlStatus = urlParams.get('status');
+    const urlMessage = urlParams.get('message');
+    const isExisting = urlParams.get('existing');
+    const isNew = urlParams.get('new');
 
-        if (!tokenHash || !type) {
-          setStatus('error');
-          setMessage('Missing confirmation parameters');
-          return;
-        }
+    if (urlStatus && urlMessage) {
+      setStatus(urlStatus as 'success' | 'error');
+      setMessage(decodeURIComponent(urlMessage));
 
-        document.cookie = `token_hash=${tokenHash}; path=/; max-age=3600; secure; samesite=strict`;
-        document.cookie = `confirmation_type=${type}; path=/; max-age=3600; secure; samesite=strict`;
-
-        const storedName = localStorage.getItem('signup_name');
-        const storedProfessions = localStorage.getItem('signup_professions');
-
-        if (!storedName || !storedProfessions) {
-          setStatus('error');
-          setMessage('Signup data not found. Please sign up again.');
-          return;
-        }
-
-        let professionsArray;
-        try {
-          professionsArray = JSON.parse(storedProfessions);
-        } catch (error) {
-          setStatus('error');
-          setMessage('Invalid professions data');
-          return;
-        }
-
-        const confirmationData = {
-          token_hash: tokenHash,
-          type: type,
-          name: storedName,
-          professions: professionsArray
-        };
-
-        const response = await fetch('/api/confirm-signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(confirmationData),
-          credentials: 'include'
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          setStatus('success');
-          setMessage('Email confirmed successfully! You can now log in.');
-          
-          localStorage.removeItem('signup_name');
-          localStorage.removeItem('signup_professions');
-          
-          setTimeout(() => {
-            navigate('/login');
-          }, 3000);
-        } else {
-          const errorData = await response.json();
-          setStatus('error');
-          setMessage(errorData.message || 'Confirmation failed');
-        }
-      } catch (error) {
-        console.error('Confirmation error:', error);
-        setStatus('error');
-        setMessage('Network error occurred during confirmation');
+      if (urlStatus === 'success') {
+        // Redirect to appropriate page after showing success message
+        setTimeout(() => {
+          if (isExisting) {
+            window.location.href = '/dashboard'; // or wherever existing users should go
+          } else if (isNew) {
+            window.location.href = '/welcome'; // or onboarding page for new users
+          } else {
+            window.location.href = '/login';
+          }
+        }, 3000);
       }
-    };
-
-    confirmSignup();
-  }, [searchParams, navigate]);
+    } else {
+      // If no status in URL, show error
+      setStatus('error');
+      setMessage('Invalid confirmation link');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -95,7 +48,7 @@ const ConfirmSignup: React.FC = () => {
           {status === 'loading' && (
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Confirming your email...</p>
+              <p className="text-gray-600">Processing confirmation...</p>
             </div>
           )}
           
@@ -107,7 +60,7 @@ const ConfirmSignup: React.FC = () => {
                 </svg>
               </div>
               <p className="text-green-600 font-medium">{message}</p>
-              <p className="text-sm text-gray-500 mt-2">Redirecting to login page...</p>
+              <p className="text-sm text-gray-500 mt-2">Redirecting...</p>
             </div>
           )}
           
@@ -120,7 +73,7 @@ const ConfirmSignup: React.FC = () => {
               </div>
               <p className="text-red-600 font-medium">{message}</p>
               <button
-                onClick={() => navigate('/signup')}
+                onClick={() => window.location.href = '/signup'}
                 className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
               >
                 Back to Sign Up

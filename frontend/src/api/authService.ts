@@ -7,16 +7,13 @@ export const signUpUser = async (userData: SignUpData): Promise<ApiResponse> => 
   try {
     const { email, password, name, profession } = userData;
     
-    const localStorageData = { name, profession };
     
-    localStorage.setItem('pendingUserData', JSON.stringify(localStorageData));
-    
-    const response = await fetch('http://localhost:3000/signup', {
+    const response = await fetch('http://localhost:5000/api/auth/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, name, profession, bio: 'kokori' }),
     });
 
     const data = await response.json();
@@ -42,26 +39,10 @@ export const signUpUser = async (userData: SignUpData): Promise<ApiResponse> => 
   }
 };
 
-// Helper function to retrieve pending user data after magic link verification
-export const getPendingUserData = (): Partial<SignUpData> | null => {
-  try {
-    const data = localStorage.getItem('pendingUserData');
-    return data ? JSON.parse(data) : null;
-  } catch (error) {
-    console.error('Error parsing pending user data:', error);
-    return null;
-  }
-};
-
-// Helper function to clear pending user data after successful verification
-export const clearPendingUserData = (): void => {
-  localStorage.removeItem('pendingUserData');
-};
-
 export const loginUser = async (userData: LoginData): Promise<ApiResponse> => {
   console.log(userData, 'userdata')
   try {
-    const response = await fetch('http://localhost:3000/login', {
+    const response = await fetch('http://localhost:5000/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
