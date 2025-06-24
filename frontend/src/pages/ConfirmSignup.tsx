@@ -4,32 +4,41 @@ const ConfirmSignup: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
 
+  const setCookie = (name: string, value: string, days: number = 30) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;secure;samesite=strict`;
+  };
+
   useEffect(() => {
-    // Get status from URL parameters (set by backend redirect)
     const urlParams = new URLSearchParams(window.location.search);
     const urlStatus = urlParams.get('status');
     const urlMessage = urlParams.get('message');
     const isExisting = urlParams.get('existing');
     const isNew = urlParams.get('new');
+    const tokenHash = urlParams.get('tokenhash');
+
+    if (tokenHash) {
+      setCookie('tokenhash', tokenHash, 30);
+      console.log('Token hash saved to cookies:', tokenHash);
+    }
 
     if (urlStatus && urlMessage) {
       setStatus(urlStatus as 'success' | 'error');
       setMessage(decodeURIComponent(urlMessage));
 
       if (urlStatus === 'success') {
-        // Redirect to appropriate page after showing success message
         setTimeout(() => {
           if (isExisting) {
-            window.location.href = '/dashboard'; // or wherever existing users should go
+            window.location.href = '/';
           } else if (isNew) {
-            window.location.href = '/welcome'; // or onboarding page for new users
+            window.location.href = '/';
           } else {
             window.location.href = '/login';
           }
         }, 3000);
       }
     } else {
-      // If no status in URL, show error
       setStatus('error');
       setMessage('Invalid confirmation link');
     }
