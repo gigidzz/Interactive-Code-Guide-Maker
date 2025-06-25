@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import ConfirmSignup from './pages/ConfirmSignup';
+import CodeGuideEditor from './pages/AddCodeGuide';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/confirm" element={<ConfirmSignup />} />
+            <Route path="/code-guide" element={<CodeGuideEditor />} />
           </Routes>
         </div>
       </UserProvider>

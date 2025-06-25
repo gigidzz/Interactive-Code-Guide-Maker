@@ -1,41 +1,37 @@
 import { useState, useEffect } from 'react';
-import type { CodeGuideFilters, CodeGuideResponse } from '../types/codeGuides';
+import type { CodeGuideFilters, CodeGuideResponse, Guide } from "../types/codeGuides";
 
-// const mockCodeGuides: CodeGuide[] = [
-//   {
-//     id: '1',
-//     name: 'React Hooks Guide',
-//     category: 'Frontend',
-//     language: 'JavaScript',
-//     description: 'Complete guide to React hooks with practical examples and best practices.',
-//     stars: 156,
-//     uploadedBy: 'john_dev',
-//     code: 'import React, { useState, useEffect } from "react";\n\nconst MyComponent = () => {\n  const [count, setCount] = useState(0);\n  \n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>\n        Increment\n      </button>\n    </div>\n  );\n};',
-//     createdAt: '2024-01-15'
-//   },
-//   {
-//     id: '2',
-//     name: 'Python Data Analysis',
-//     category: 'Data Science',
-//     language: 'Python',
-//     description: 'Comprehensive guide for data analysis using pandas and numpy.',
-//     stars: 89,
-//     uploadedBy: 'data_scientist',
-//     code: 'import pandas as pd\nimport numpy as np\n\n# Load data\ndf = pd.read_csv("data.csv")\n\n# Basic analysis\nprint(df.describe())\nprint(df.info())',
-//     createdAt: '2024-01-10'
-//   },
-//   {
-//     id: '3',
-//     name: 'Node.js API Setup',
-//     category: 'Backend',
-//     language: 'JavaScript',
-//     description: 'Step-by-step guide to create a REST API with Node.js and Express.',
-//     stars: 234,
-//     uploadedBy: 'backend_master',
-//     code: 'const express = require("express");\nconst app = express();\n\napp.use(express.json());\n\napp.get("/api/users", (req, res) => {\n  res.json({ users: [] });\n});\n\napp.listen(3000, () => {\n  console.log("Server running on port 3000");\n});',
-//     createdAt: '2024-01-20'
-//   }
-// ];
+const API_BASE_URL = 'http://localhost:5000/api';
+
+export const saveCodeGuide = async (guide: Guide): Promise<{ success: boolean; message?: string }> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/codeguides`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(guide),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data, 'saving code guide data')
+      return { success: true, message: 'Guide saved successfully!' };
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      return { 
+        success: false, 
+        message: errorData.message || `Failed to save guide (${response.status})` 
+      };
+    }
+  } catch (error) {
+    console.error('Error saving guide:', error);
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : 'Network error occurred' 
+    };
+  }
+};
 
 export const fetchCodeGuides = async (
   filters: CodeGuideFilters = {}
