@@ -9,7 +9,6 @@ export interface SignUpFormState {
 export interface LoginFormState {
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 export interface SignUpFormErrors {
@@ -35,5 +34,4 @@ export interface SignUpData {
 export interface LoginData {
   email: string;
   password: string;
-  rememberMe?: boolean;
 }

@@ -1,7 +1,8 @@
 // components/Navbar.tsx
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useUser, removeCookie } from '../hooks/useUser';
+import { useUser } from '../context/userContext';
 import UserCard from './UserCard';
+import { removeCookie } from '../utils/cookies';
 
 const Navbar = () => {
   const location = useLocation();

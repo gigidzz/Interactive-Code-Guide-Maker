@@ -1,24 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { setCookie } from '../utils/cookies';
 
 const ConfirmSignup: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
 
-  const setCookie = (name: string, value: string, days: number = 30) => {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-    
-    // Remove secure flag if not on HTTPS, and add domain for broader accessibility
-    const isSecure = window.location.protocol === 'https:';
-    const cookieString = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/${isSecure ? ';secure' : ''};samesite=lax`;
-    
-    document.cookie = cookieString;
-    console.log('Setting cookie:', cookieString);
-    
-    // Verify the cookie was set
-    const cookieValue = getCookie(name);
-    console.log('Cookie verification - set value:', value, 'retrieved value:', cookieValue);
-  };
+
 
   const getCookie = (name: string): string | null => {
     const nameEQ = name + "=";
@@ -37,8 +24,6 @@ const ConfirmSignup: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlStatus = urlParams.get('status');
     const urlMessage = urlParams.get('message');
-    const isExisting = urlParams.get('existing');
-    const isNew = urlParams.get('new');
     const access_token = urlParams.get('access_token');
 
     console.log('Token hash from URL:', access_token);

@@ -1,6 +1,7 @@
 import { useReducer, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../api/authService';
+import { useUser } from '../context/userContext'; // Updated import
 import type { LoginFormErrors, LoginFormState } from '../types/authTypes';
 
 type FormAction =
@@ -9,8 +10,7 @@ type FormAction =
 
 const initialFormState: LoginFormState = {
   email: '',
-  password: '',
-  rememberMe: false
+  password: ''
 };
 
 const formReducer = (state: LoginFormState, action: FormAction): LoginFormState => {
@@ -28,6 +28,8 @@ const formReducer = (state: LoginFormState, action: FormAction): LoginFormState 
 };
 
 const Login = () => {
+  const navigate = useNavigate(); // Add this hook
+  const { refetchUser } = useUser(); // Add this hook to refetch user data
   const [formState, dispatch] = useReducer(formReducer, initialFormState);
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -77,16 +79,39 @@ const Login = () => {
     setIsLoading(true);
     setApiError('');
 
-    const result = await loginUser(formState);
+    try {
+      const result = await loginUser(formState);
 
-    if (result.success) {
-      console.log('Login successful:', result.data);
-      dispatch({ type: 'RESET_FORM' });
-    } else {
-      setApiError(result.message || 'Failed to sign in');
+      if (result.success) {
+        console.log('Login successful:', result.data);
+        dispatch({ type: 'RESET_FORM' });
+        
+        // If your backend returns the token in the response body, set it manually
+        if (result.data.token) {
+          document.cookie = `accesstoken=${result.data.token}; path=/; max-age=86400`;
+        }
+        
+        // Add a small delay to ensure cookie is set
+        setTimeout(async () => {
+          // Check if cookie was set
+          const token = document.cookie.split('; ').find(row => row.startsWith('accesstoken='));
+          console.log('Cookie after login:', token);
+          
+          // Refetch user data to update the navbar
+          await refetchUser();
+          
+          // Navigate to home page
+          navigate('/', { replace: true });
+        }, 100);
+      } else {
+        setApiError(result.message || 'Failed to sign in');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setApiError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -163,22 +188,6 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="rememberMe"
-                  name="rememberMe"
-                  type="checkbox"
-                  checked={formState.rememberMe}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
-
-            </div>
 
             <div>
               <button
