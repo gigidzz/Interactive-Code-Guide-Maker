@@ -75,3 +75,8 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+

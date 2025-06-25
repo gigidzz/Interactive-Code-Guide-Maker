@@ -24,7 +24,7 @@ export class AuthService {
     return tempId;
   }
 
-  // Send magic link
+  // Send magic link for signup
   static async sendMagicLink(email: string, password: string): Promise<void> {
     const { error } = await supabase.auth.signUp({ email: email, password: password });
 
@@ -32,6 +32,21 @@ export class AuthService {
       throw new Error(`Failed to send magic link: ${error.message}`);
     }
   }
+
+  // Send magic link for login (existing users)
+  static async loginSupabase(email: string, password: string): Promise<string> {
+    const { data, error } = await supabase.auth.signInWithPassword({ 
+      email: email, 
+      password: password 
+    });
+
+    if (error) {
+      throw new Error(`Failed to send login magic link: ${error.message}`);
+    }
+
+    return data.session.access_token
+  }
+
 
   // Verify magic link token
   static async verifyMagicLink(token: string, type: string) {
@@ -144,4 +159,49 @@ export class AuthService {
     throw error;
   }
 }
+  // Get user profile by email
+  static async getUserByEmail(email: string): Promise<User | null> {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Failed to get user by email: ${error.message}`);
+    }
+
+    return data;
+  }
+
+  // Get current authenticated user
+  static async getCurrentUser() {
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error) {
+      throw new Error(`Failed to get current user: ${error.message}`);
+    }
+
+    return user;
+  }
+
+  // Logout user
+  static async logout(): Promise<void> {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      throw new Error(`Failed to logout: ${error.message}`);
+    }
+  }
+
+  // Refresh session
+  static async refreshSession() {
+    const { data, error } = await supabase.auth.refreshSession();
+
+    if (error) {
+      throw new Error(`Failed to refresh session: ${error.message}`);
+    }
+
+    return data;
+  }
 }
