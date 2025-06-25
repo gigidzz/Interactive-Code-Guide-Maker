@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { AuthService } from '../services/authServices';
-import { validateRequest } from '../middleware';
+import { validateRequest, authenticateToken } from '../middleware';
 import { SignupRequest, ConfirmRequest, ApiResponse } from '../types';
 
 const router = Router();
@@ -71,7 +71,7 @@ router.get('/confirm',
       
       if (existingProfile) {
         // User already exists - redirect to login success
-        return res.redirect(`${process.env.FRONTEND_URL}/confirm?status=success&message=Login successful&existing=true`);
+        return res.redirect(`${process.env.FRONTEND_URL}/confirm?access_token=${authData.session!.access_token}&status=success&message=Login successful&existing=true`);
       }
 
       const tempData = await AuthService.getTempSignupData(user.email!);
@@ -92,7 +92,7 @@ router.get('/confirm',
       await AuthService.cleanupTempData(user.email!);
 
       // Redirect to success page
-      return res.redirect(`${process.env.FRONTEND_URL}/confirm?status=success&message=Account created successfully&new=true`);
+      return res.redirect(`${process.env.FRONTEND_URL}/confirm?access_token=${authData.session!.access_token}&status=success&message=Account created successfully&new=true`);
 
     } catch (error) {
       console.error('Confirm error:', error);
@@ -101,4 +101,92 @@ router.get('/confirm',
   }
 );
 
+router.get('/user/me',
+  authenticateToken, // Apply authentication middleware
+  async (req: Request, res: Response<ApiResponse>) => {
+    try {
+      console.log('lolapoa')
+      // req.user is set by the authenticateToken middleware
+      if (!req.user) {
+        const response: ApiResponse = {
+          success: false,
+          message: 'User not authenticated',
+          error: 'NOT_AUTHENTICATED'
+        };
+        return res.status(401).json(response);
+      }
+
+      console.log(req.user, 'req user')
+
+      // Get user profile from public.users table using the auth user ID
+      const userProfile = await AuthService.getUserByAuthId(req.user.id);
+
+      if (!userProfile) {
+        const response: ApiResponse = {
+          success: false,
+          message: 'User profile not found',
+          error: 'PROFILE_NOT_FOUND'
+        };
+        return res.status(404).json(response);
+      }
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'User profile retrieved successfully',
+        data: {
+          id: userProfile.id,
+          email: userProfile.email,
+          name: userProfile.name,
+          profession: userProfile.profession,
+          bio: userProfile.bio,
+          profile_picture: userProfile.profile_picture
+        }
+      };
+
+      return res.status(200).json(response);
+
+    } catch (error) {
+      console.error('Get user profile error:', error);
+      
+      const response: ApiResponse = {
+        success: false,
+        message: 'Failed to get user profile',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+
+      return res.status(500).json(response);
+    }
+  }
+);
+
+/**
+ * POST /api/auth/logout
+ * Logout user (optional - for cleanup)
+ */
+router.post('/logout',
+  authenticateToken,
+  async (req: Request, res: Response<ApiResponse>) => {
+    try {
+      // You can add any server-side logout logic here
+      // For example, blacklisting tokens, cleaning up sessions, etc.
+      
+      const response: ApiResponse = {
+        success: true,
+        message: 'Logged out successfully'
+      };
+
+      return res.status(200).json(response);
+    } catch (error) {
+      console.error('Logout error:', error);
+      
+      const response: ApiResponse = {
+        success: false,
+        message: 'Failed to logout',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+
+      return res.status(500).json(response);
+    }
+  }
+);
 export default router;

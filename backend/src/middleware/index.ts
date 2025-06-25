@@ -50,3 +50,5 @@ export const errorHandler = (
   res.status(500).json(response);
 };
 
+// Export the authentication middleware
+export { authenticateToken } from './auth';

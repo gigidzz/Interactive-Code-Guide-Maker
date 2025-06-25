@@ -7,7 +7,30 @@ const ConfirmSignup: React.FC = () => {
   const setCookie = (name: string, value: string, days: number = 30) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;secure;samesite=strict`;
+    
+    // Remove secure flag if not on HTTPS, and add domain for broader accessibility
+    const isSecure = window.location.protocol === 'https:';
+    const cookieString = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/${isSecure ? ';secure' : ''};samesite=lax`;
+    
+    document.cookie = cookieString;
+    console.log('Setting cookie:', cookieString);
+    
+    // Verify the cookie was set
+    const cookieValue = getCookie(name);
+    console.log('Cookie verification - set value:', value, 'retrieved value:', cookieValue);
+  };
+
+  const getCookie = (name: string): string | null => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) {
+        return decodeURIComponent(c.substring(nameEQ.length, c.length));
+      }
+    }
+    return null;
   };
 
   useEffect(() => {
@@ -16,11 +39,21 @@ const ConfirmSignup: React.FC = () => {
     const urlMessage = urlParams.get('message');
     const isExisting = urlParams.get('existing');
     const isNew = urlParams.get('new');
-    const tokenHash = urlParams.get('tokenhash');
+    const access_token = urlParams.get('access_token');
 
-    if (tokenHash) {
-      setCookie('tokenhash', tokenHash, 30);
-      console.log('Token hash saved to cookies:', tokenHash);
+    console.log('Token hash from URL:', access_token);
+    console.log('Current protocol:', window.location.protocol);
+    console.log('Current domain:', window.location.hostname);
+
+    if (access_token) {
+      setCookie('accesstoken', access_token, 30);
+      console.log('Token hash saved to cookies:', access_token);
+      
+      // Additional verification
+      setTimeout(() => {
+        const savedToken = getCookie('accesstoken');
+        console.log('Token verification after timeout:', savedToken);
+      }, 100);
     }
 
     if (urlStatus && urlMessage) {
@@ -28,15 +61,15 @@ const ConfirmSignup: React.FC = () => {
       setMessage(decodeURIComponent(urlMessage));
 
       if (urlStatus === 'success') {
-        setTimeout(() => {
-          if (isExisting) {
-            window.location.href = '/';
-          } else if (isNew) {
-            window.location.href = '/';
-          } else {
-            window.location.href = '/login';
-          }
-        }, 3000);
+        // setTimeout(() => {
+        //   if (isExisting) {
+        //     window.location.href = '/';
+        //   } else if (isNew) {
+        //     window.location.href = '/';
+        //   } else {
+        //     window.location.href = '/login';
+        //   }
+        // }, 2000);
       }
     } else {
       setStatus('error');

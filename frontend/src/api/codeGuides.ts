@@ -49,7 +49,7 @@ export const fetchCodeGuides = async (
       return acc;
     }, {} as any);
 
-    const response = await fetch('http://localhost:3000/codeguides', {
+    const response = await fetch('http://localhost:5000/codeguides', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

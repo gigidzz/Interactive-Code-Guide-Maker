@@ -125,4 +125,23 @@ export class AuthService {
 
     return data;
   }
+
+  static async getUserByAuthId(authUserId: string): Promise<User | null> {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUserId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Failed to get user by auth ID: ${error.message}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error getting user by auth ID:', error);
+    throw error;
+  }
+}
 }
