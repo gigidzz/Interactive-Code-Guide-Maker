@@ -3,6 +3,24 @@ import { supabase } from '../config/supabase';
 import { Guide, Step } from '../types';
 
 export class CodeGuideService {
+  private static createUserClient(userToken: string) {
+    return createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${userToken}`
+          }
+        }
+      }
+    );
+  }
+
   static async getGuides(filters: {
     search?: string;
     category?: string;
@@ -14,20 +32,22 @@ export class CodeGuideService {
       .select('*');
 
     if (filters.search) {
-      query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      query = query.or(`title.ilike.%${filters.search}%,tags.cs.{"${filters.search}"}`);
     }
 
     if (filters.category) {
-      query = query.eq('category', filters.category);
+      query = query.eq('category', filters.category.toLowerCase());
     }
 
     if (filters.code_language) {
-      query = query.eq('code_language', filters.code_language);
+      query = query.eq('code_language', filters.code_language.toLowerCase());
     }
 
     query = query.order('created_at', { ascending: filters.order === 'asc' });
 
     const { data, error } = await query;
+
+    console.log(error, 'err')
 
     if (error) throw error;
     return data;
@@ -44,41 +64,12 @@ export class CodeGuideService {
     return data;
   }
 
-// Update your CodeGuideService
-static async createGuide(guide: Guide, userToken: string) {
-  // Create a user-specific supabase client
-  const userSupabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!, // Use anon key, not service role
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${userToken}`
-        }
-      }
-    }
-  );
+  static async createGuide(guide: Guide, userToken: string) {
+    const userSupabase = this.createUserClient(userToken);
 
-  const { data, error } = await userSupabase
-    .from('guides')
-    .insert(guide)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-  static async updateGuide(id: string, guide: Partial<Guide>, userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await userSupabase
       .from('guides')
-      .update(guide)
-      .eq('id', id)
-      .eq('author_id', userId)
+      .insert(guide)
       .select()
       .single();
 
@@ -86,12 +77,27 @@ static async createGuide(guide: Guide, userToken: string) {
     return data;
   }
 
-  static async deleteGuide(id: string, userId: string) {
-    const { error } = await supabase
+  static async updateGuide(id: string, guide: Partial<Guide>, userToken: string) {
+    const userSupabase = this.createUserClient(userToken);
+
+    const { data, error } = await userSupabase
+      .from('guides')
+      .update(guide)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteGuide(id: string, userToken: string) {
+    const userSupabase = this.createUserClient(userToken);
+
+    const { error } = await userSupabase
       .from('guides')
       .delete()
-      .eq('id', id)
-      .eq('author_id', userId);
+      .eq('id', id);
 
     if (error) throw error;
   }
@@ -107,19 +113,25 @@ static async createGuide(guide: Guide, userToken: string) {
     return data;
   }
 
-  static async createStep(step: Step) {
-    const { data, error } = await supabase
+  static async createStep(step: Step, userToken: string) {
+    const userSupabase = this.createUserClient(userToken);
+
+    console.log(step, 'stepunia')
+    const { data, error } = await userSupabase
       .from('steps')
       .insert(step)
       .select()
       .single();
 
+    console.log(error)
     if (error) throw error;
     return data;
   }
 
-  static async updateStep(id: string, step: Partial<Step>) {
-    const { data, error } = await supabase
+  static async updateStep(id: string, step: Partial<Step>, userToken: string) {
+    const userSupabase = this.createUserClient(userToken);
+
+    const { data, error } = await userSupabase
       .from('steps')
       .update(step)
       .eq('id', id)
@@ -130,8 +142,10 @@ static async createGuide(guide: Guide, userToken: string) {
     return data;
   }
 
-  static async deleteStep(id: string) {
-    const { error } = await supabase
+  static async deleteStep(id: string, userToken: string) {
+    const userSupabase = this.createUserClient(userToken);
+
+    const { error } = await userSupabase
       .from('steps')
       .delete()
       .eq('id', id);

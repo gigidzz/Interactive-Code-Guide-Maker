@@ -4,7 +4,7 @@ export interface CodeGuide {
   title: string;
   description: string;
   author_id: string;
-  tags?: string;
+  tags?: string[];
   code_snippet: string;
   code_language?: string;
   category?: string;

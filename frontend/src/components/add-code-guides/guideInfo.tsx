@@ -1,40 +1,7 @@
 import { Zap } from "lucide-react";
 import type { GuideInfoProps } from "../../types/codeGuides";
 import TagManager from "./tagsManager";
-
-const CATEGORIES = [
-  'Frontend',
-  'Backend', 
-  'Database',
-  'DevOps',
-  'Mobile',
-  'Data Science',
-  'Algorithm',
-  'Architecture',
-  'Testing',
-  'Security',
-  'Other'
-];
-
-const LANGUAGES = [
-  'javascript',
-  'typescript', 
-  'python',
-  'java',
-  'go',
-  'rust',
-  'php',
-  'ruby',
-  'swift',
-  'kotlin',
-  'c++',
-  'c#',
-  'html',
-  'css',
-  'sql',
-  'shell',
-  'other'
-];
+import { CATEGORIES, LANGUAGES } from "../selectionsOptions";
 
 const GuideInfo: React.FC<GuideInfoProps> = ({ guide, onUpdateGuide }) => {
   const handleAddTag = (tag: string): void => {

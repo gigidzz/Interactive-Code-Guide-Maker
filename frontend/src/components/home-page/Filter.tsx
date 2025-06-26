@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Filter } from 'lucide-react';
 import type { Filters, SearchAndFiltersProps } from '../../types';
+import { CATEGORIES, LANGUAGES } from '../selectionsOptions';
 
 const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   searchTerm,
@@ -17,9 +18,9 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   const resetFilters = () => {
     setFilters({
       category: '',
-      language: '',
+      code_language: '',
       minStars: 0,
-      sortBy: 'newest'
+      sortBy: 'asc'
     });
     setSearchTerm('');
   };
@@ -58,41 +59,26 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Categories</option>
-                <option value="Frontend">Frontend</option>
-                <option value="Backend">Backend</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Mobile">Mobile</option>
-                <option value="DevOps">DevOps</option>
+                {CATEGORIES.map((category) => {
+                  return <option value={category}>{category}</option>
+                })}
               </select>
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
               <select
-                value={filters.language}
-                onChange={(e) => updateFilter('language', e.target.value)}
+                value={filters.code_language}
+                onChange={(e) => updateFilter('code_language', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Languages</option>
-                <option value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-                <option value="TypeScript">TypeScript</option>
-                <option value="Java">Java</option>
-                <option value="Go">Go</option>
+                {LANGUAGES.map((language) => {
+                  return <option value={language}>{language}</option>
+                })}
               </select>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Min Stars</label>
-              <input
-                type="number"
-                min="0"
-                value={filters.minStars}
-                onChange={(e) => updateFilter('minStars', parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="0"
-              />
-            </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
@@ -101,10 +87,8 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
                 onChange={(e) => updateFilter('sortBy', e.target.value as Filters['sortBy'])}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-                <option value="stars">Most Stars</option>
-                <option value="name">Name A-Z</option>
+                <option value="asc">ascending</option>
+                <option value="desc">descending</option>
               </select>
             </div>
           </div>

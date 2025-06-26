@@ -13,9 +13,9 @@ const Home: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     category: '',
-    language: '',
+    code_language: '',
     minStars: 0,
-    sortBy: 'newest'
+    sortBy: 'asc'
   });
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -27,7 +27,6 @@ const Home: React.FC = () => {
       const response = await fetchCodeGuides({
         ...filters,
         search: debouncedSearchTerm,
-        minStars: filters.minStars || undefined
       });
       setCodeGuides(response.data || response);
     } catch (err) {
