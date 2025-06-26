@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import codeGuideRoutes from './routes/codeGuide';
 import { errorHandler } from './middleware';
 import { AuthService } from './services/authServices';
 
@@ -33,6 +34,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/code-guides', codeGuideRoutes);
 
 
 app.use(errorHandler);
