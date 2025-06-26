@@ -1,26 +1,44 @@
 import React, { useEffect, useState } from 'react';
+import { setCookie } from '../utils/cookies';
 
 const ConfirmSignup: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
 
-  const setCookie = (name: string, value: string, days: number = 30) => {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;secure;samesite=strict`;
+
+
+  const getCookie = (name: string): string | null => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) {
+        return decodeURIComponent(c.substring(nameEQ.length, c.length));
+      }
+    }
+    return null;
   };
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlStatus = urlParams.get('status');
     const urlMessage = urlParams.get('message');
-    const isExisting = urlParams.get('existing');
-    const isNew = urlParams.get('new');
-    const tokenHash = urlParams.get('tokenhash');
+    const access_token = urlParams.get('access_token');
 
-    if (tokenHash) {
-      setCookie('tokenhash', tokenHash, 30);
-      console.log('Token hash saved to cookies:', tokenHash);
+    console.log('Token hash from URL:', access_token);
+    console.log('Current protocol:', window.location.protocol);
+    console.log('Current domain:', window.location.hostname);
+
+    if (access_token) {
+      setCookie('accesstoken', access_token, 30);
+      console.log('Token hash saved to cookies:', access_token);
+      
+      // Additional verification
+      setTimeout(() => {
+        const savedToken = getCookie('accesstoken');
+        console.log('Token verification after timeout:', savedToken);
+      }, 100);
     }
 
     if (urlStatus && urlMessage) {
@@ -28,15 +46,15 @@ const ConfirmSignup: React.FC = () => {
       setMessage(decodeURIComponent(urlMessage));
 
       if (urlStatus === 'success') {
-        setTimeout(() => {
-          if (isExisting) {
-            window.location.href = '/';
-          } else if (isNew) {
-            window.location.href = '/';
-          } else {
-            window.location.href = '/login';
-          }
-        }, 3000);
+        // setTimeout(() => {
+        //   if (isExisting) {
+        //     window.location.href = '/';
+        //   } else if (isNew) {
+        //     window.location.href = '/';
+        //   } else {
+        //     window.location.href = '/login';
+        //   }
+        // }, 2000);
       }
     } else {
       setStatus('error');

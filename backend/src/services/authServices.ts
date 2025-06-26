@@ -1,9 +1,8 @@
-import { supabase} from '../config/supabase';
+import { supabase } from '../config/supabase';
 import { UserExtraData, TempSignup, User } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 export class AuthService {
-  // Store temporary signup data
   static async storeTempSignupData(email: string, extraData: UserExtraData): Promise<string> {
     const tempId = uuidv4();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
@@ -24,16 +23,21 @@ export class AuthService {
     return tempId;
   }
 
-  // Send magic link
   static async sendMagicLink(email: string, password: string): Promise<void> {
-    const { error } = await supabase.auth.signUp({ email: email, password: password });
-
+    const { error } = await supabase.auth.signUp({ email, password });
     if (error) {
       throw new Error(`Failed to send magic link: ${error.message}`);
     }
   }
 
-  // Verify magic link token
+  static async loginSupabase(email: string, password: string): Promise<string> {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      throw new Error(`Failed to login: ${error.message}`);
+    }
+    return data.session.access_token;
+  }
+
   static async verifyMagicLink(token: string, type: string) {
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: token,
@@ -47,7 +51,6 @@ export class AuthService {
     return data;
   }
 
-  // Get temporary signup data
   static async getTempSignupData(email: string): Promise<TempSignup | null> {
     const { data, error } = await supabase
       .from('temp_signups')
@@ -56,14 +59,13 @@ export class AuthService {
       .gt('expires_at', new Date().toISOString())
       .single();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+    if (error && error.code !== 'PGRST116') {
       throw new Error(`Failed to get temporary data: ${error.message}`);
     }
 
     return data;
   }
 
-  // Create user profile
   static async createUserProfile(authUserId: string, email: string, extraData: UserExtraData): Promise<User> {
     const userData = {
       id: authUserId,
@@ -87,7 +89,6 @@ export class AuthService {
     return data;
   }
 
-  // Clean up temporary data
   static async cleanupTempData(email: string): Promise<void> {
     const { error } = await supabase
       .from('temp_signups')
@@ -99,7 +100,6 @@ export class AuthService {
     }
   }
 
-  // Clean up expired temporary data (should be run periodically)
   static async cleanupExpiredTempData(): Promise<void> {
     const { error } = await supabase
       .from('temp_signups')
@@ -111,7 +111,6 @@ export class AuthService {
     }
   }
 
-  // Get user profile by ID
   static async getUserProfile(userId: string): Promise<User | null> {
     const { data, error } = await supabase
       .from('users')
@@ -121,6 +120,34 @@ export class AuthService {
 
     if (error && error.code !== 'PGRST116') {
       throw new Error(`Failed to get user profile: ${error.message}`);
+    }
+
+    return data;
+  }
+
+  static async getUserByAuthId(authUserId: string): Promise<User | null> {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUserId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Failed to get user by auth ID: ${error.message}`);
+    }
+
+    return data;
+  }
+
+  static async getUserByEmail(email: string): Promise<User | null> {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Failed to get user by email: ${error.message}`);
     }
 
     return data;

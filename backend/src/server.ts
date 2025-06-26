@@ -3,18 +3,19 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import codeGuideRoutes from './routes/codeGuide';
 import { errorHandler } from './middleware';
 import { AuthService } from './services/authServices';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001/',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with']
@@ -33,6 +34,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/code-guides', codeGuideRoutes);
 
 
 app.use(errorHandler);

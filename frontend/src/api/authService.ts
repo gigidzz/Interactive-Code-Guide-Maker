@@ -1,5 +1,6 @@
 import type { ApiResponse } from "../types";
 import type { LoginData, SignUpData } from "../types/authTypes";
+import { setCookie } from "../utils/cookies";
 
 export const signUpUser = async (userData: SignUpData): Promise<ApiResponse> => {
   console.log(userData, 'userdata')
@@ -42,7 +43,7 @@ export const signUpUser = async (userData: SignUpData): Promise<ApiResponse> => 
 export const loginUser = async (userData: LoginData): Promise<ApiResponse> => {
   console.log(userData, 'userdata')
   try {
-    const response = await fetch('http://localhost:5000/login', {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,6 +56,10 @@ export const loginUser = async (userData: LoginData): Promise<ApiResponse> => {
     if (!response.ok) {
       throw new Error(data.message || 'Login failed');
     }
+
+    console.log(data, 'dataa')
+
+    setCookie('accesstoken', data.data.access_token, 30)
 
     return {
       success: true,
