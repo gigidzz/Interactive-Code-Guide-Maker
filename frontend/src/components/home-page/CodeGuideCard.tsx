@@ -1,5 +1,6 @@
 import { User, Tag, Calendar, Hash } from 'lucide-react';
 import type { CodeGuide } from '../../types/codeGuides';
+import { Link } from 'react-router-dom';
 
 export const CodeGuideCard: React.FC<{ guide: CodeGuide }> = ({ guide }) => {
   const formatDate = (dateString?: string) => {
@@ -62,9 +63,9 @@ export const CodeGuideCard: React.FC<{ guide: CodeGuide }> = ({ guide }) => {
               </div>
             )}
           </div>
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105">
+          <Link to={guide.id!} className="text-nowrap bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105">
             View Code
-          </button>
+          </Link>
         </div>
       </div>
     </div>

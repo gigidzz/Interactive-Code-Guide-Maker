@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { CodeGuideFilters, CodeGuideResponse, Guide, Step } from "../types/codeGuides";
+import type { CodeGuide, CodeGuideFilters, CodeGuideResponse, Guide, Step } from "../types/codeGuides";
 import { getCookie } from '../utils/cookies';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -130,4 +130,59 @@ export const useDebounce = <T>(value: T, delay: number): T => {
   }, [value, delay]);
 
   return debouncedValue;
+};
+
+export const getCodeGuideById = async (id: string): Promise<CodeGuide> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/code-guides/guides/${id}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch code guide: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching code guide:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch steps for a specific guide
+ */
+export const getStepsByGuideId = async (guideId: string): Promise<Step[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/code-guides/guides/${guideId}/steps`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch steps: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching steps:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch code guide with its steps in a single call
+ */
+export const getCodeGuideWithSteps = async (id: string): Promise<{
+  guide: CodeGuide;
+  steps: Step[];
+}> => {
+  try {
+    const [guide, steps] = await Promise.all([
+      getCodeGuideById(id),
+      getStepsByGuideId(id)
+    ]);
+    
+    return { guide, steps };
+  } catch (error) {
+    console.error('Error fetching code guide with steps:', error);
+    throw error;
+  }
 };
