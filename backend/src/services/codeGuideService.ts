@@ -1,3 +1,4 @@
+import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import { Guide, Step } from '../types';
 
@@ -43,16 +44,34 @@ export class CodeGuideService {
     return data;
   }
 
-  static async createGuide(guide: Guide) {
-    const { data, error } = await supabase
-      .from('guides')
-      .insert(guide)
-      .select()
-      .single();
+// Update your CodeGuideService
+static async createGuide(guide: Guide, userToken: string) {
+  // Create a user-specific supabase client
+  const userSupabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!, // Use anon key, not service role
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      },
+      global: {
+        headers: {
+          Authorization: `Bearer ${userToken}`
+        }
+      }
+    }
+  );
 
-    if (error) throw error;
-    return data;
-  }
+  const { data, error } = await userSupabase
+    .from('guides')
+    .insert(guide)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
 
   static async updateGuide(id: string, guide: Partial<Guide>, userId: string) {
     const { data, error } = await supabase

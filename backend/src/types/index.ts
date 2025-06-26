@@ -1,9 +1,11 @@
+import { UUID } from "crypto";
+
 export type Guide = {
   id?: string;
   created_at?: string;
   title: string;
   description: string;
-  author_id: string;
+  author_id: UUID;
   tags?: string;
   code_snippet?: string;
   code_language?: string;

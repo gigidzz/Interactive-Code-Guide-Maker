@@ -1,22 +1,29 @@
 import { useState, useEffect } from 'react';
-import type { CodeGuideFilters, CodeGuideResponse, Guide } from "../types/codeGuides";
+import type { CodeGuideFilters, CodeGuideResponse, Guide, Step } from "../types/codeGuides";
+import { getCookie } from '../utils/cookies';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
-export const saveCodeGuide = async (guide: Guide): Promise<{ success: boolean; message?: string }> => {
+export const saveCodeGuide = async (guide: Guide): Promise<{ success: boolean; message?: string; guideId?: string }> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/codeguides`, {
+    console.log(guide,'radedistyvna unda')
+    const response = await fetch(`${API_BASE_URL}/code-guides/guides`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getCookie('accesstoken')}`
       },
       body: JSON.stringify(guide),
     });
 
     if (response.ok) {
       const data = await response.json();
-      console.log(data, 'saving code guide data')
-      return { success: true, message: 'Guide saved successfully!' };
+      console.log(data, 'saving code guide data');
+      return { 
+        success: true, 
+        message: 'Guide saved successfully!', 
+        guideId: data.id || data.data?.id 
+      };
     } else {
       const errorData = await response.json().catch(() => ({}));
       return { 
@@ -33,6 +40,43 @@ export const saveCodeGuide = async (guide: Guide): Promise<{ success: boolean; m
   }
 };
 
+export const saveSteps = async (steps: Omit<Step, 'id'>[]): Promise<{ success: boolean; message?: string }> => {
+  try {
+    // Save all steps
+    const stepPromises = steps.map(step => 
+      fetch(`${API_BASE_URL}/code-guides/steps`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getCookie('accesstoken')}`
+        },
+        body: JSON.stringify(step),
+      })
+    );
+
+    const responses = await Promise.all(stepPromises);
+    
+    // Check if all requests were successful
+    const allSuccessful = responses.every(response => response.ok);
+    
+    if (allSuccessful) {
+      return { success: true, message: 'All steps saved successfully!' };
+    } else {
+      const failedCount = responses.filter(response => !response.ok).length;
+      return { 
+        success: false, 
+        message: `Failed to save ${failedCount} step(s)` 
+      };
+    }
+  } catch (error) {
+    console.error('Error saving steps:', error);
+    return { 
+      success: false, 
+      message: error instanceof Error ? error.message : 'Network error occurred while saving steps' 
+    };
+  }
+};
+
 export const fetchCodeGuides = async (
   filters: CodeGuideFilters = {}
 ): Promise<CodeGuideResponse> => {
@@ -45,12 +89,20 @@ export const fetchCodeGuides = async (
       return acc;
     }, {} as any);
 
-    const response = await fetch('http://localhost:5000/codeguides', {
-      method: 'POST',
+    // Convert filters to URL search params
+    const searchParams = new URLSearchParams();
+    Object.entries(cleanFilters).forEach(([key, value]) => {
+      searchParams.append(key, String(value));
+    });
+
+    const queryString = searchParams.toString();
+    const url = `${API_BASE_URL}/code-guides/guides${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(cleanFilters),
     });
 
     if (!response.ok) {

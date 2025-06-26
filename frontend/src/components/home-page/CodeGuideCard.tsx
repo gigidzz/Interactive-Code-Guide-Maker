@@ -6,19 +6,19 @@ export const CodeGuideCard: React.FC<{ guide: CodeGuide }> = ({ guide }) => {
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
       <div className="relative bg-gray-900 p-4 h-32 overflow-hidden">
         <pre className="text-sm text-green-400 font-mono leading-tight">
-          <code>{guide.code.slice(0, 150)}...</code>
+          <code>{guide.code_snippet.slice(0, 150)}...</code>
         </pre>
         <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
-          {guide.language}
+          {guide.code_language}
         </div>
       </div>
       
       <div className="p-6">
         <div className="flex items-start justify-between mb-3">
-          <h3 className="text-xl font-bold text-gray-900 leading-tight">{guide.name}</h3>
+          <h3 className="text-xl font-bold text-gray-900 leading-tight">{guide.title}</h3>
           <div className="flex items-center text-yellow-500 ml-2">
             <Star className="w-4 h-4 fill-current" />
-            <span className="text-sm font-medium text-gray-700 ml-1">{guide.stars}</span>
+            {/* <span className="text-sm font-medium text-gray-700 ml-1">{guide.stars}</span> */}
           </div>
         </div>
         
@@ -34,7 +34,7 @@ export const CodeGuideCard: React.FC<{ guide: CodeGuide }> = ({ guide }) => {
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div className="flex items-center text-sm text-gray-500">
             <User className="w-4 h-4 mr-1" />
-            <span className="font-medium">{guide.uploadedBy}</span>
+            <span className="font-medium">{guide.author_id}</span>
           </div>
           <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105">
             View Code

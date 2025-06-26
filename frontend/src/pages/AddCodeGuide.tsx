@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Guide, LineSelection, Step } from "../types/codeGuides";
-import { saveCodeGuide } from '../api/codeGuides';
+import { saveCodeGuide, saveSteps } from '../api/codeGuides';
 import Header from "../components/add-code-guides/guideHeader";
 import CodeEditor from "../components/add-code-guides/codeEditor";
 import CodeLinesDisplay from "../components/add-code-guides/codeLinesDisplay";
@@ -14,9 +14,12 @@ const CodeGuideEditor: React.FC = () => {
   const [guide, setGuide] = useState<Guide>({
     title: '',
     description: '',
-    tags: [],
-    steps: []
+    tags: [], // Changed from undefined to empty array
+    code_snippet: undefined,
+    code_language: undefined,
+    category: undefined
   });
+  const [steps, setSteps] = useState<Step[]>([]);
   const [selectedLines, setSelectedLines] = useState<LineSelection | null>(null);
   const [previewMode, setPreviewMode] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -40,54 +43,95 @@ const CodeGuideEditor: React.FC = () => {
   const handleAddStep = (title: string, description: string): void => {
     if (!selectedLines) return;
 
-    const getSelectedCode = (): string => {
-      return codeLines
-        .slice(selectedLines.start - 1, selectedLines.end)
-        .join('\n');
-    };
-
     const step: Step = {
-      id: Date.now().toString(),
-      stepNumber: guide.steps.length + 1,
+      guide_id: '', // Will be set after guide is saved
+      step_number: steps.length + 1,
       title,
       description,
-      startLine: selectedLines.start,
-      endLine: selectedLines.end,
-      codeSnippet: getSelectedCode()
+      start_line: selectedLines.start,
+      end_line: selectedLines.end
     };
 
-    setGuide(prev => ({
-      ...prev,
-      steps: [...prev.steps, step]
-    }));
-
+    setSteps(prev => [...prev, step]);
     setSelectedLines(null);
   };
 
   const handleRemoveStep = (stepId: string): void => {
-    setGuide(prev => ({
-      ...prev,
-      steps: prev.steps.filter(step => step.id !== stepId)
-        .map((step, index) => ({ ...step, stepNumber: index + 1 }))
-    }));
+    setSteps(prev => 
+      prev.filter(step => step.id !== stepId)
+        .map((step, index) => ({ ...step, step_number: index + 1 }))
+    );
   };
 
   const handleSaveGuide = async (): Promise<void> => {
     if (isSaving) return;
     
+    // Basic validation
+    if (!guide.title.trim()) {
+      alert('Please enter a guide title');
+      return;
+    }
+    
+    if (!guide.description.trim()) {
+      alert('Please enter a guide description');
+      return;
+    }
+    
+    if (!code.trim()) {
+      alert('Please enter some code');
+      return;
+    }
+    
     setIsSaving(true);
     
     try {
-      console.log(guide, 'guideeeee')
-      const result = await saveCodeGuide(guide);
+      // Prepare guide data with code
+      const guideToSave: Guide = {
+        ...guide,
+        code_snippet: code
+      };
+
+      console.log('Saving guide:', guideToSave);
       
-      if (result.success) {
-        alert(result.message || 'Guide saved successfully!');
-        setGuide({ title: '', description: '', tags: [], steps: [] });
-        setCode('');
-      } else {
-        alert(result.message || 'Failed to save guide');
+      // Save the guide first
+      const guideResult = await saveCodeGuide(guideToSave);
+      
+      if (!guideResult.success) {
+        alert(guideResult.message || 'Failed to save guide');
+        return;
       }
+
+      // If we have steps and a guide ID, save the steps
+      if (steps.length > 0 && guideResult.guideId) {
+        const stepsToSave = steps.map(step => ({
+          ...step,
+          guide_id: guideResult.guideId!
+        }));
+
+        console.log('Saving steps:', stepsToSave);
+        
+        const stepsResult = await saveSteps(stepsToSave);
+        
+        if (!stepsResult.success) {
+          alert(`Guide saved but failed to save steps: ${stepsResult.message}`);
+          return;
+        }
+      }
+
+      alert('Guide and steps saved successfully!');
+      
+      // Reset form
+      setGuide({
+        title: '',
+        description: '',
+        tags: [], // Changed from undefined to empty array
+        code_snippet: undefined,
+        code_language: undefined,
+        category: undefined
+      });
+      setSteps([]);
+      setCode('');
+      
     } catch (error) {
       console.error('Unexpected error:', error);
       alert('An unexpected error occurred while saving the guide');
@@ -114,7 +158,7 @@ const CodeGuideEditor: React.FC = () => {
             <CodeLinesDisplay
               code={code}
               selectedLines={selectedLines}
-              steps={guide.steps}
+              steps={steps}
               onLineClick={handleLineClick}
             />
           </div>
@@ -134,7 +178,7 @@ const CodeGuideEditor: React.FC = () => {
             )}
 
             <StepsList
-              steps={guide.steps}
+              steps={steps}
               onRemoveStep={handleRemoveStep}
             />
 

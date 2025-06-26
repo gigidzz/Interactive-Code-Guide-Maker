@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { CodeGuideService } from '../services/codeGuideService';
+import { UUID } from 'crypto';
 
 export class CodeGuideController {
   static async getGuides(req: Request, res: Response) {
     try {
-      const { search, category, code_language, order = 'desc' } = req.body;
+      const { search, category, code_language, order = 'desc' } = req.query;
 
       const guides = await CodeGuideService.getGuides({
         search: search as string,
@@ -44,27 +45,31 @@ export class CodeGuideController {
     }
   }
 
-  static async createGuide(req: Request, res: Response) {
-    try {
-      const guideData = {
-        ...req.body,
-        author_id: req.user!.id
-      };
+static async createGuide(req: Request, res: Response) {
+  try {
+    const guideData = {
+      ...req.body,
+      author_id: req.user!.id as UUID
+    };
 
-      const guide = await CodeGuideService.createGuide(guideData);
+    // Extract token from authorization header
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    const guide = await CodeGuideService.createGuide(guideData, token!);
 
-      res.status(201).json({
-        success: true,
-        data: guide
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: 'Failed to create guide',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
+    res.status(201).json({
+      success: true,
+      data: guide
+    });
+  } catch (error) {
+    console.log(error, 'errorrrrr')
+    res.status(400).json({
+      success: false,
+      message: 'Failed to create guide',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
+}
 
   static async updateGuide(req: Request, res: Response) {
     try {

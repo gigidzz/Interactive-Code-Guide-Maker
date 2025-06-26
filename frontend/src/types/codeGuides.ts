@@ -1,13 +1,13 @@
 export interface CodeGuide {
-  id: string;
-  name: string;
-  category: string;
-  language: string;
+  id?: string;
+  created_at?: string;
+  title: string;
   description: string;
-  stars: number;
-  uploadedBy: string;
-  code: string;
-  createdAt: string;
+  author_id: string;
+  tags?: string;
+  code_snippet: string;
+  code_language?: string;
+  category?: string;
 }
 
 export interface CodeGuideResponse {
@@ -19,9 +19,9 @@ export interface CodeGuideResponse {
 
 export interface CodeGuideFilters {
   category?: string;
-  language?: string;
+  code_language?: string;
   minStars?: number;
-  sortBy?: 'newest' | 'oldest' | 'stars' | 'name';
+  order?: 'asc' | 'desc';
   search?: string;
 }
 
@@ -31,21 +31,26 @@ export interface CodeGuidesGridProps {
   onRetry: () => void;
 }
 
+// Updated Step interface to match backend
 export interface Step {
-  id: string;
-  stepNumber: number;
+  id?: string;
+  guide_id: string;
+  step_number: number;
   title: string;
   description: string;
-  startLine: number;
-  endLine: number;
-  codeSnippet: string;
+  start_line: number;
+  end_line: number;
 }
 
 export interface Guide {
+  id?: string;
+  created_at?: string;
   title: string;
   description: string;
-  tags: string[];
-  steps: Step[];
+  tags?: string[];
+  code_snippet?: string;
+  code_language?: string;
+  category?: string;
 }
 
 export interface LineSelection {
