@@ -31,7 +31,6 @@ export interface CodeGuidesGridProps {
   onRetry: () => void;
 }
 
-// Updated Step interface to match backend
 export interface Step {
   id?: string;
   guide_id: string;
