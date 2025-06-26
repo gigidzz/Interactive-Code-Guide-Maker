@@ -5,13 +5,13 @@ import { UUID } from 'crypto';
 export class CodeGuideController {
   static async getGuides(req: Request, res: Response) {
     try {
-      const { search, category, code_language, order = 'desc' } = req.query;
+      const { search, category, code_language, sortBy } = req.query;
 
       const guides = await CodeGuideService.getGuides({
         search: search as string,
         category: category as string,
         code_language: code_language as string,
-        order: order as 'asc' | 'desc'
+        order: sortBy as 'asc' | 'desc'
       });
 
       res.json({
@@ -74,7 +74,8 @@ static async createGuide(req: Request, res: Response) {
   static async updateGuide(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const guide = await CodeGuideService.updateGuide(id, req.body, req.user!.id);
+      const token = req.headers.authorization?.split(' ')[1]
+      const guide = await CodeGuideService.updateGuide(id, req.body, token!);
 
       res.json({
         success: true,
@@ -92,7 +93,8 @@ static async createGuide(req: Request, res: Response) {
   static async deleteGuide(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      await CodeGuideService.deleteGuide(id, req.user!.id);
+      const token = req.headers.authorization?.split(' ')[1]
+      await CodeGuideService.deleteGuide(id, token!);
 
       res.json({
         success: true,
@@ -127,7 +129,8 @@ static async createGuide(req: Request, res: Response) {
 
   static async createStep(req: Request, res: Response) {
     try {
-      const step = await CodeGuideService.createStep(req.body);
+      const token = req.headers.authorization?.split(' ')[1]
+      const step = await CodeGuideService.createStep(req.body, token!);
 
       res.status(201).json({
         success: true,
@@ -145,7 +148,8 @@ static async createGuide(req: Request, res: Response) {
   static async updateStep(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const step = await CodeGuideService.updateStep(id, req.body);
+      const token = req.headers.authorization?.split(' ')[1]
+      const step = await CodeGuideService.updateStep(id, req.body, token!);
 
       res.json({
         success: true,
@@ -163,7 +167,8 @@ static async createGuide(req: Request, res: Response) {
   static async deleteStep(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      await CodeGuideService.deleteStep(id);
+      const token = req.headers.authorization?.split(' ')[1]
+      await CodeGuideService.deleteStep(id, token!);
 
       res.json({
         success: true,
