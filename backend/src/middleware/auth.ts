@@ -1,9 +1,6 @@
-// middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
 import { supabase } from '../config/supabase';
-import { ApiResponse } from '../types';
 
-// Extend Request interface to include user
 declare global {
   namespace Express {
     interface Request {
@@ -21,38 +18,31 @@ export const authenticateToken = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<any> => {
+): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const token = authHeader?.split(' ')[1];
 
-    // Also check for token in cookies as backup
-    const cookieToken = req.cookies?.accesstoken;
-    
-    const tokenToUse = token || cookieToken;
-
-    if (!tokenToUse) {
-      const response: ApiResponse = {
+    if (!token) {
+      res.status(401).json({
         success: false,
         message: 'Access token required',
         error: 'MISSING_TOKEN'
-      };
-      return res.status(401).json(response);
+      });
+      return;
     }
-    console.log(tokenToUse,'tokenToUse')
-    // Get user from Supabase using the token
-    const { data: { user }, error } = await supabase.auth.getUser(tokenToUse);
+
+    const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      const response: ApiResponse = {
+      res.status(401).json({
         success: false,
         message: 'Invalid or expired token',
         error: 'INVALID_TOKEN'
-      };
-      return res.status(401).json(response);
+      });
+      return;
     }
 
-    // Add user to request object
     req.user = {
       id: user.id,
       email: user.email!,
@@ -63,11 +53,10 @@ export const authenticateToken = async (
     next();
   } catch (error) {
     console.error('Authentication error:', error);
-    const response: ApiResponse = {
+    res.status(401).json({
       success: false,
       message: 'Authentication failed',
       error: 'AUTH_ERROR'
-    };
-    return res.status(401).json(response);
+    });
   }
 };
