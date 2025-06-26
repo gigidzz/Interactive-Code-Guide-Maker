@@ -6,7 +6,6 @@ const API_BASE_URL = 'http://localhost:5000/api';
 
 export const saveCodeGuide = async (guide: Guide): Promise<{ success: boolean; message?: string; guideId?: string }> => {
   try {
-    console.log(guide,'radedistyvna unda')
     const response = await fetch(`${API_BASE_URL}/code-guides/guides`, {
       method: 'POST',
       headers: {
@@ -97,7 +96,7 @@ export const fetchCodeGuides = async (
 
     const queryString = searchParams.toString();
     const url = `${API_BASE_URL}/code-guides/guides${queryString ? `?${queryString}` : ''}`;
-
+console.log(url, 'url')
     const response = await fetch(url, {
       method: 'GET',
       headers: {

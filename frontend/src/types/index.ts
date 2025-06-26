@@ -6,9 +6,9 @@ export interface ApiResponse {
 
 export interface Filters {
   category: string;
-  language: string;
+  code_language: string;
   minStars: number;
-  sortBy: 'newest' | 'oldest' | 'stars' | 'name';
+  sortBy: 'asc' | 'desc';
 }
 
 export interface SearchAndFiltersProps {
