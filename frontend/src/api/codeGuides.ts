@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { CodeGuide, CodeGuideFilters, CodeGuideResponse, Guide, Step } from "../types/codeGuides";
+import type { CodeGuide, CodeGuideFilters, CodeGuideResponse, Guide } from "../types/codeGuides";
 import { getCookie } from '../utils/cookies';
 
 const API_BASE_URL = 'http://localhost:5000/api';
