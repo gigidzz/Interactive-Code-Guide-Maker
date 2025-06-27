@@ -60,8 +60,6 @@ export interface LineSelection {
 export interface CodeEditorProps {
   code: string;
   onCodeChange: (code: string) => void;
-  previewMode: boolean;
-  onPreviewToggle: () => void;
 }
 
 export interface CodeLineProps {
