@@ -39,18 +39,28 @@ const Home: React.FC = () => {
   }, [filters, debouncedSearchTerm]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-slate-900">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <Code className="w-12 h-12 text-blue-600 mr-3" />
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <div className="flex items-center justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full"></div>
+              <Code className="relative w-12 h-12 text-purple-400 mr-3" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">
               Code Guides
             </h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Discover and explore comprehensive code guides from our community
           </p>
+          
+          {/* Decorative elements */}
+          <div className="mt-8 flex justify-center space-x-1">
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-75"></div>
+            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-150"></div>
+          </div>
         </div>
 
         <SearchAndFilters

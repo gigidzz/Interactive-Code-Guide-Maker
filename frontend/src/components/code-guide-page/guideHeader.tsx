@@ -8,7 +8,6 @@ interface GuideHeaderProps {
 }
 
 const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
-  // const navigate = useNavigate(); // Uncomment if using react-router-dom
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Unknown date';
@@ -21,26 +20,26 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
 
   const getLanguageColor = (language?: string) => {
     const colors: Record<string, string> = {
-      javascript: 'bg-yellow-100 text-yellow-800',
-      typescript: 'bg-blue-100 text-blue-800',
-      python: 'bg-green-100 text-green-800',
-      java: 'bg-orange-100 text-orange-800',
-      cpp: 'bg-purple-100 text-purple-800',
-      c: 'bg-gray-100 text-gray-800',
-      html: 'bg-red-100 text-red-800',
-      css: 'bg-pink-100 text-pink-800',
-      sql: 'bg-cyan-100 text-cyan-800',
+      javascript: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+      typescript: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+      python: 'bg-green-500/20 text-green-300 border-green-500/30',
+      java: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+      cpp: 'bg-purple-400/20 text-purple-300 border-purple-400/30',
+      c: 'bg-slate-400/20 text-slate-300 border-slate-400/30',
+      html: 'bg-red-500/20 text-red-300 border-red-500/30',
+      css: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+      sql: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
     };
-    return colors[language?.toLowerCase() || ''] || 'bg-gray-100 text-gray-800';
+    return colors[language?.toLowerCase() || ''] || 'bg-slate-400/20 text-slate-300 border-slate-400/30';
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white rounded-lg shadow-xl p-8 mb-8">
+    <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 text-white rounded-xl shadow-2xl p-8 mb-8 border border-purple-500/20">
       <div className="max-w-4xl mx-auto">
         {/* Back button */}
         <button
           onClick={onBack || (() => window.history.back())}
-          className="flex items-center text-white/80 hover:text-white mb-6 transition-colors duration-200 group"
+          className="flex items-center text-purple-300 hover:text-purple-200 mb-6 transition-all duration-200 group hover:bg-purple-800/20 px-3 py-2 rounded-lg"
         >
           <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
           Back to Guides
@@ -48,30 +47,30 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
 
         {/* Title and Description */}
         <div className="mb-6">
-          <h1 className="text-4xl font-bold mb-4 leading-tight">
+          <h1 className="text-4xl font-bold mb-4 leading-tight bg-gradient-to-r from-purple-300 to-purple-100 bg-clip-text text-transparent">
             {guide.title}
           </h1>
-          <p className="text-xl text-white/90 leading-relaxed max-w-3xl">
+          <p className="text-xl text-slate-300 leading-relaxed max-w-3xl">
             {guide.description}
           </p>
         </div>
 
         {/* Meta Information */}
         <div className="flex flex-wrap items-center gap-6 mb-6">
-          <div className="flex items-center text-white/80">
+          <div className="flex items-center text-slate-400">
             <User size={18} className="mr-2" />
             <span>Author: {guide.author_id}</span>
           </div>
           
-          <div className="flex items-center text-white/80">
+          <div className="flex items-center text-slate-400">
             <Calendar size={18} className="mr-2" />
             <span>{formatDate(guide.created_at)}</span>
           </div>
 
           {guide.code_language && (
             <div className="flex items-center">
-              <Code size={18} className="mr-2 text-white/80" />
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getLanguageColor(guide.code_language)} bg-white/20 text-white border border-white/30`}>
+              <Code size={18} className="mr-2 text-slate-400" />
+              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getLanguageColor(guide.code_language)}`}>
                 {guide.code_language.toUpperCase()}
               </span>
             </div>
@@ -79,7 +78,7 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
 
           {guide.category && (
             <div className="flex items-center">
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white border border-white/30">
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30">
                 {guide.category}
               </span>
             </div>
@@ -89,11 +88,11 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
         {/* Tags */}
         {guide.tags && guide.tags.length > 0 && (
           <div className="flex items-center flex-wrap gap-2">
-            <Tag size={18} className="text-white/80 mr-2" />
+            <Tag size={18} className="text-slate-400 mr-2" />
             {guide.tags.map((tag, index) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-sm font-medium text-white hover:bg-white/30 transition-colors duration-200"
+                className="px-3 py-1 bg-slate-800/50 backdrop-blur-sm border border-purple-500/30 rounded-full text-sm font-medium text-purple-200 hover:bg-slate-700/50 hover:border-purple-400/50 transition-all duration-200"
               >
                 #{tag}
               </span>

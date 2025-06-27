@@ -26,22 +26,22 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
+    <div className="bg-slate-800 rounded-2xl shadow-xl p-6 mb-8 border border-purple-500/20 backdrop-blur-sm">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
           <input
             type="text"
             placeholder="Search code guides..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
           />
         </div>
         
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200 font-medium text-gray-700"
+          className="flex items-center justify-center px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors duration-200 font-medium text-slate-200 border border-slate-600 hover:border-purple-500/50"
         >
           <Filter className="w-5 h-5 mr-2" />
           Filters
@@ -49,43 +49,43 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
       </div>
 
       {showFilters && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-6 pt-6 border-t border-slate-600">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
               <select
                 value={filters.category}
                 onChange={(e) => updateFilter('category', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
               >
                 <option value="">All Categories</option>
                 {CATEGORIES.map((category) => {
-                  return <option value={category}>{category}</option>
+                  return <option key={category} value={category}>{category}</option>
                 })}
               </select>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Language</label>
               <select
                 value={filters.code_language}
                 onChange={(e) => updateFilter('code_language', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
               >
                 <option value="">All Languages</option>
                 {LANGUAGES.map((language) => {
-                  return <option value={language}>{language}</option>
+                  return <option key={language} value={language}>{language}</option>
                 })}
               </select>
             </div>
             
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Sort By</label>
               <select
                 value={filters.sortBy}
                 onChange={(e) => updateFilter('sortBy', e.target.value as Filters['sortBy'])}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
               >
                 <option value="asc">ascending</option>
                 <option value="desc">descending</option>
@@ -96,7 +96,7 @@ const SearchAndFilters: React.FC<SearchAndFiltersProps> = ({
           <div className="mt-4 flex justify-end">
             <button
               onClick={resetFilters}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors duration-200"
+              className="px-4 py-2 text-sm text-slate-400 hover:text-purple-400 font-medium transition-colors duration-200"
             >
               Reset Filters
             </button>

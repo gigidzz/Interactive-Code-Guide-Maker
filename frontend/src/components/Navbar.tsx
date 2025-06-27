@@ -1,4 +1,3 @@
-// components/Navbar.tsx
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/userContext';
 import UserCard from './UserCard';
@@ -17,7 +16,6 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      // Call logout endpoint if you have one
       await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include',
@@ -25,28 +23,24 @@ const Navbar = () => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Remove token from cookies
       removeCookie('accesstoken');
-      // Refetch user to update state
       await refetchUser();
-      // Redirect to home page
       navigate('/');
     }
   };
 
-  // Don't render anything while loading to prevent flash
   if (isLoading) {
     return (
-      <nav className="bg-white shadow-lg">
+      <nav className="bg-slate-900 shadow-xl border-b border-purple-500/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-gray-800">
+              <Link to="/" className="text-xl font-bold text-purple-400">
                 LUIGI
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-8 h-8 bg-slate-700 rounded-full animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -55,36 +49,35 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-slate-900 shadow-xl border-b border-purple-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="text-xl font-bold text-gray-800">
+            <Link to="/" className="text-xl font-bold text-purple-400 hover:text-purple-300 transition-colors">
               LUIGI
             </Link>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             <Link
               to="/"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive('/')
-                  ? 'bg-blue-500 text-white'
-                  : 'text-gray-700 hover:text-blue-500 hover:bg-gray-100'
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               Home
             </Link>
             
             {user ? (
-              // User is logged in - show user card and code guide button
               <>
                 <Link
                   to="/code-guide"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive('/code-guide')
-                      ? 'bg-blue-500 text-white'
-                      : 'text-gray-700 hover:text-blue-500 hover:bg-gray-100'
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800'
                   }`}
                 >
                   Code Guide
@@ -92,14 +85,13 @@ const Navbar = () => {
                 <UserCard user={user} onLogout={handleLogout} />
               </>
             ) : (
-              // User is not logged in - show login and signup buttons
               <>
                 <Link
                   to="/login"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive('/login')
-                      ? 'bg-blue-500 text-white'
-                      : 'text-gray-700 hover:text-blue-500 hover:bg-gray-100'
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800'
                   }`}
                 >
                   Login
@@ -107,8 +99,10 @@ const Navbar = () => {
                 
                 <Link
                   to="/signup"
-                  className={`px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-blue-600 transition-colors ${
-                    isActive('/signup') ? 'bg-blue-600' : 'bg-gray-500'
+                  className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-all duration-200 ${
+                    isActive('/signup') 
+                      ? 'bg-purple-700 shadow-lg shadow-purple-700/25' 
+                      : 'bg-gray-600 hover:bg-purple-700 shadow-md shadow-purple-600/25 hover:shadow-lg hover:shadow-purple-600/30'
                   }`}
                 >
                   Sign Up
