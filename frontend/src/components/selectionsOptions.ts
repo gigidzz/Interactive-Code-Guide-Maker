@@ -14,5 +14,6 @@ export const LANGUAGES = [
   'typescript', 
   'python',
   'java',
+  'html',
   'other'
 ];

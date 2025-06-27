@@ -14,14 +14,13 @@ const CodeGuideEditor: React.FC = () => {
   const [guide, setGuide] = useState<Guide>({
     title: '',
     description: '',
-    tags: [], // Changed from undefined to empty array
+    tags: [],
     code_snippet: undefined,
     code_language: undefined,
     category: undefined
   });
   const [steps, setSteps] = useState<Step[]>([]);
   const [selectedLines, setSelectedLines] = useState<LineSelection | null>(null);
-  const [previewMode, setPreviewMode] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const codeLines = code.split('\n');
@@ -44,7 +43,7 @@ const CodeGuideEditor: React.FC = () => {
     if (!selectedLines) return;
 
     const step: Step = {
-      guide_id: '', // Will be set after guide is saved
+      guide_id: '',
       step_number: steps.length + 1,
       title,
       description,
@@ -66,7 +65,6 @@ const CodeGuideEditor: React.FC = () => {
   const handleSaveGuide = async (): Promise<void> => {
     if (isSaving) return;
     
-    // Basic validation
     if (!guide.title.trim()) {
       alert('Please enter a guide title');
       return;
@@ -85,7 +83,6 @@ const CodeGuideEditor: React.FC = () => {
     setIsSaving(true);
     
     try {
-      // Prepare guide data with code
       const guideToSave: Guide = {
         ...guide,
         code_snippet: code
@@ -93,7 +90,6 @@ const CodeGuideEditor: React.FC = () => {
 
       console.log('Saving guide:', guideToSave);
       
-      // Save the guide first
       const guideResult = await saveCodeGuide(guideToSave);
       
       if (!guideResult.success) {
@@ -101,7 +97,6 @@ const CodeGuideEditor: React.FC = () => {
         return;
       }
 
-      // If we have steps and a guide ID, save the steps
       if (steps.length > 0 && guideResult.guideId) {
         const stepsToSave = steps.map(step => ({
           ...step,
@@ -120,11 +115,10 @@ const CodeGuideEditor: React.FC = () => {
 
       alert('Guide and steps saved successfully!');
       
-      // Reset form
       setGuide({
         title: '',
         description: '',
-        tags: [], // Changed from undefined to empty array
+        tags: [],
         code_snippet: undefined,
         code_language: undefined,
         category: undefined
@@ -146,13 +140,10 @@ const CodeGuideEditor: React.FC = () => {
         <Header />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {/* Left Panel */}
           <div className="space-y-6">
             <CodeEditor
               code={code}
               onCodeChange={setCode}
-              previewMode={previewMode}
-              onPreviewToggle={() => setPreviewMode(!previewMode)}
             />
 
             <CodeLinesDisplay
