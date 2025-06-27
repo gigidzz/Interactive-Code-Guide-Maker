@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { CodeGuide, CodeGuideFilters, CodeGuideResponse, Guide } from "../types/codeGuides";
 import { getCookie } from '../utils/cookies';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.BACKEND_URL;
 
 export const saveCodeGuide = async (guide: Guide): Promise<{ success: boolean; message?: string; guideId?: string }> => {
   try {
