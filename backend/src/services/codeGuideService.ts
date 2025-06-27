@@ -81,6 +81,25 @@ export class CodeGuideService {
     };
   }
 
+  static async getGuideByAuthorId(id: string): Promise<GuideWithStepsAndUser[]> {
+    const { data, error } = await supabase
+      .from('guides')
+      .select(`
+        *,
+        author:users!guides_author_id_fkey(*),
+        steps(*)
+      `)
+      .eq('author_id', id)
+
+    if (error) throw error;
+
+     return data?.map(guide => ({
+      ...guide,
+      author: guide.author,
+      steps: guide.steps.sort((a: Step, b: Step) => a.step_number - b.step_number)
+    })) || [];
+  }
+
   static async createGuide(guideRequest: CreateGuideRequest, userToken: string, authorId: UUID): Promise<GuideWithStepsAndUser> {
     const userSupabase = this.createUserClient(userToken);
 

@@ -82,7 +82,6 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
           )}
         </div>
 
-        {/* Tags */}
         {guide.tags && guide.tags.length > 0 && (
           <div className="flex items-center flex-wrap gap-2">
             <Tag size={18} className="text-slate-400 mr-2" />

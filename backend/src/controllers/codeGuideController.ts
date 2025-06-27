@@ -46,6 +46,24 @@ export class CodeGuideController {
     }
   }
 
+    static async getGuideByAuthorId(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const guide = await CodeGuideService.getGuideByAuthorId(id);
+
+      res.json({
+        success: true,
+        data: guide
+      });
+    } catch (error) {
+      res.status(404).json({
+        success: false,
+        message: 'Guide not found',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
   static async createGuide(req: Request, res: Response) {
     try {
       const guideRequest: CreateGuideRequest = req.body;

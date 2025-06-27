@@ -63,7 +63,7 @@ export const CodeGuideCard: React.FC<{ guide: CodeGuide }> = ({ guide }) => {
             )}
           </div>
           <Link 
-            to={guide.id!} 
+            to={`/${guide.id!}`} 
             className="text-nowrap bg-gradient-to-r from-purple-600 to-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-purple-700 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40"
           >
             View Code

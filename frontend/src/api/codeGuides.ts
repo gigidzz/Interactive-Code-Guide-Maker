@@ -109,3 +109,19 @@ export const getCodeGuideById = async (id: string): Promise<CodeGuide> => {
     throw error;
   }
 };
+
+export const getCodeGuideByAuthorId = async (id: string): Promise<CodeGuide[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/code-guides/guides/author/${id}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch code guide: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching code guide:', error);
+    throw error;
+  }
+};
