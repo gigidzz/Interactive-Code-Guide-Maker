@@ -19,3 +19,10 @@ export interface SearchAndFiltersProps {
   showFilters: boolean;
   setShowFilters: (show: boolean) => void;
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  bio?: string;
+}

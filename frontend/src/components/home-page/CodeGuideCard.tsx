@@ -53,7 +53,7 @@ export const CodeGuideCard: React.FC<{ guide: CodeGuide }> = ({ guide }) => {
           <div className="flex items-center gap-4 text-sm text-slate-400">
             <div className="flex items-center">
               <User className="w-4 h-4 mr-1" />
-              <span className="font-medium">{guide.author_id}</span>
+              <span className="font-medium">{guide.author!.name}</span>
             </div>
             {guide.created_at && (
               <div className="flex items-center">

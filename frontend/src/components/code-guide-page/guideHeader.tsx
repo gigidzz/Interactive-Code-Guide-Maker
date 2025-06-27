@@ -36,7 +36,6 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
   return (
     <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 text-white rounded-xl shadow-2xl p-8 mb-8 border border-purple-500/20">
       <div className="max-w-4xl mx-auto">
-        {/* Back button */}
         <button
           onClick={onBack || (() => window.history.back())}
           className="flex items-center text-purple-300 hover:text-purple-200 mb-6 transition-all duration-200 group hover:bg-purple-800/20 px-3 py-2 rounded-lg"
@@ -45,7 +44,6 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
           Back to Guides
         </button>
 
-        {/* Title and Description */}
         <div className="mb-6">
           <h1 className="text-4xl font-bold mb-4 leading-tight bg-gradient-to-r from-purple-300 to-purple-100 bg-clip-text text-transparent">
             {guide.title}
@@ -55,11 +53,10 @@ const GuideHeader: React.FC<GuideHeaderProps> = ({ guide, onBack }) => {
           </p>
         </div>
 
-        {/* Meta Information */}
         <div className="flex flex-wrap items-center gap-6 mb-6">
           <div className="flex items-center text-slate-400">
             <User size={18} className="mr-2" />
-            <span>Author: {guide.author_id}</span>
+            <span>Author: {guide.author.name}</span>
           </div>
           
           <div className="flex items-center text-slate-400">

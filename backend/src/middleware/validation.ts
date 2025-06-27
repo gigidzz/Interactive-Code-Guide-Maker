@@ -26,6 +26,17 @@ export const validateGuide = [
   validateRequest
 ];
 
+export const validateGuideWithSteps = [
+  body('title').trim().isLength({ min: 1 }).withMessage('Title is required'),
+  body('description').trim().isLength({ min: 1 }).withMessage('Description is required'),
+  body('tags').optional().isArray(),
+  body('code_snippet').optional().isString(),
+  body('code_language').optional().isString(),
+  body('category').optional().isString(),
+  body('steps').optional().isArray(),
+  validateRequest
+];
+
 export const validateStep = [
   body('guide_id').isUUID().withMessage('Valid guide ID is required'),
   body('step_number').isInt({ min: 1 }).withMessage('Step number must be a positive integer'),

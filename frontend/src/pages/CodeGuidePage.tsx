@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCodeGuideWithSteps } from '../api/codeGuides';
+import { getCodeGuideById } from '../api/codeGuides';
 import CodeHighlight from '../components/code-guide-page/codeHighlight';
 import StepNavigator from '../components/code-guide-page/stepNavigator';
 import GuideHeader from '../components/code-guide-page/guideHeader';
 import LoadingSpinner from '../components/loadingSpinner';
 import ErrorDisplay from '../components/errorDisplay';
-import type { CodeGuide, Step } from '../types/codeGuides';
+import type { CodeGuide } from '../types/codeGuides';
 
 const CodeGuidePage: React.FC = () => {
   const { 'guide-id': guideId } = useParams<{ 'guide-id': string }>();
   
   const [guide, setGuide] = useState<CodeGuide | null>(null);
-  const [steps, setSteps] = useState<Step[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
@@ -29,12 +28,8 @@ const CodeGuidePage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getCodeGuideWithSteps(guideId);
-      setGuide(data.guide);
-      setSteps(data.steps);
-      if (data.steps.length > 0) {
-        setCurrentStep(1);
-      }
+      const data = await getCodeGuideById(guideId);
+      setGuide(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load code guide');
     } finally {
@@ -54,7 +49,7 @@ const CodeGuidePage: React.FC = () => {
   };
 
   const getCurrentHighlightedLines = () => {
-    const currentStepData = steps.find(step => step.step_number === currentStep);
+    const currentStepData = guide!.steps!.find(step => step.step_number === currentStep);
     if (!currentStepData) return [];
     
     const lines = [];
@@ -105,9 +100,9 @@ const CodeGuidePage: React.FC = () => {
 
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-              {steps.length > 0 ? (
+              {guide!.steps!.length > 0 ? (
                 <StepNavigator
-                  steps={steps}
+                  steps={guide!.steps!}
                   currentStep={currentStep}
                   onStepChange={handleStepChange}
                 />

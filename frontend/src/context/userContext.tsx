@@ -1,14 +1,7 @@
-// contexts/UserContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { getCookie, removeCookie } from '../utils/cookies';
-
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  // Add other user properties as needed
-}
+import type { User } from '../types';
 
 interface UserContextType {
   user: User | null;

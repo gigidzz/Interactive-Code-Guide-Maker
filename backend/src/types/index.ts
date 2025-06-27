@@ -12,18 +12,17 @@ export type Guide = {
   category?: string;
 };
 
-
-  export interface Step {
+export interface Step {
   id?: string;
-  guide_id: string;
+  guide_id?: string;
   step_number: number;
   title: string;
   description: string;
   start_line: number;
   end_line: number;
-};
+}
 
-  export interface UserExtraData {
+export interface UserExtraData {
   name: string;
   profilePicture?: string;
   bio?: string;
@@ -44,6 +43,31 @@ export interface User {
   profile_picture?: string;
   bio?: string;
   profession?: string[];
+}
+
+export interface GuideWithStepsAndUser extends Omit<Guide, 'author_id'> {
+  author: User;
+  steps: Step[];
+}
+
+export interface CreateGuideRequest {
+  title: string;
+  description: string;
+  tags?: string;
+  code_snippet?: string;
+  code_language?: string;
+  category?: string;
+  steps: Omit<Step, 'id' | 'guide_id'>[];
+}
+
+export interface UpdateGuideRequest {
+  title?: string;
+  description?: string;
+  tags?: string;
+  code_snippet?: string;
+  code_language?: string;
+  category?: string;
+  steps?: Step[];
 }
 
 export interface SignupRequest {
@@ -70,4 +94,3 @@ export interface LoginRequest {
   email: string;
   password: string;
 }
-
