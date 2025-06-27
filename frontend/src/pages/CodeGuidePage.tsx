@@ -66,36 +66,30 @@ const CodeGuidePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <LoadingSpinner message="Loading code guide..." />
-        </div>
-      </div>
+      <LoadingSpinner/>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <ErrorDisplay error={error} onRetry={fetchData} />
-        </div>
-      </div>
+      <ErrorDisplay error={error} onRetry={fetchData}/>
     );
   }
 
   if (!guide) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-slate-950 p-6">
         <div className="max-w-7xl mx-auto">
-          <ErrorDisplay error="Code guide not found" />
+          <div className="bg-slate-900 rounded-xl border border-slate-700 p-8 text-center">
+            <p className="text-slate-300">Code guide not found</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-7xl mx-auto">
         <GuideHeader guide={guide} />
         
@@ -118,11 +112,11 @@ const CodeGuidePage: React.FC = () => {
                   onStepChange={handleStepChange}
                 />
               ) : (
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <div className="bg-slate-900 rounded-xl shadow-2xl p-6 border border-purple-500/20">
+                  <h3 className="text-lg font-semibold text-purple-300 mb-2">
                     No Steps Available
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-slate-300">
                     This code guide doesn't have any steps defined yet.
                   </p>
                 </div>
