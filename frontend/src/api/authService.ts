@@ -9,7 +9,7 @@ export const signUpUser = async (userData: SignUpData): Promise<ApiResponse> => 
     const { email, password, name, profession } = userData;
     
     
-    const response = await fetch(`${import.meta.env.BACKEND_URL}/auth/signup`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export const signUpUser = async (userData: SignUpData): Promise<ApiResponse> => 
 export const loginUser = async (userData: LoginData): Promise<ApiResponse> => {
   console.log(userData, 'userdata')
   try {
-    const response = await fetch(`${import.meta.env.BACKEND_URL}/auth/login`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

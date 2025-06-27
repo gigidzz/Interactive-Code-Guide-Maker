@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { CodeGuide, CodeGuideFilters, CodeGuideResponse, Guide } from "../types/codeGuides";
 import { getCookie } from '../utils/cookies';
 
-const API_BASE_URL = import.meta.env.BACKEND_URL;
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const saveCodeGuide = async (guide: Guide): Promise<{ success: boolean; message?: string; guideId?: string }> => {
   try {
@@ -56,8 +56,8 @@ export const fetchCodeGuides = async (
     });
 
     const queryString = searchParams.toString();
-    const url = `${API_BASE_URL}/code-guides/guides${queryString ? `?${queryString}` : ''}`;
-console.log(url, 'url')
+    const url = `${import.meta.env.VITE_BACKEND_URL}/code-guides/guides${queryString ? `?${queryString}` : ''}`;
+    console.log(url, 'url', import.meta.env.VITE_BACKEND_URL)
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -70,7 +70,6 @@ console.log(url, 'url')
     }
 
     const data = await response.json();
-    console.log(data, 'datunia datuna')
     return data;
   } catch (error) {
     console.error('Error fetching code guides:', error);

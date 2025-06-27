@@ -6,6 +6,7 @@ import { CreateGuideRequest, UpdateGuideRequest } from '../types';
 export class CodeGuideController {
   static async getGuides(req: Request, res: Response) {
     try {
+      console.log('lolipop')
       const { search, category, code_language, sortBy } = req.query;
 
       const guides = await CodeGuideService.getGuides({
@@ -14,6 +15,8 @@ export class CodeGuideController {
         code_language: code_language as string,
         order: sortBy as 'asc' | 'desc'
       });
+
+      console.log(guides, 'guidessss')
 
       res.json({
         success: true,
