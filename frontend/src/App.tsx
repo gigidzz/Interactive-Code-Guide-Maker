@@ -9,6 +9,7 @@ import CodeGuideEditor from './pages/AddCodeGuide';
 import CodeGuidePage from './pages/CodeGuidePage';
 import ProtectedRoute from './components/protectedRoute';
 import PublicRoute from './components/publicRoute';
+import { AuthorCodeGuides } from './pages/AuthorCodeGuides';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
             />
             
             <Route path="/:guide-id" element={<CodeGuidePage />} />
+            <Route path="/code-guides/:author-id" element={<AuthorCodeGuides />} />
           </Routes>
         </div>
       </UserProvider>

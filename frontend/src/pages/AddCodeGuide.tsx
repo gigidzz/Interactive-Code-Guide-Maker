@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Guide, LineSelection, Step } from "../types/codeGuides";
-import { saveCodeGuide, saveSteps } from '../api/codeGuides';
+import { saveCodeGuide } from '../api/codeGuides';
 import Header from "../components/add-code-guides/guideHeader";
 import CodeEditor from "../components/add-code-guides/codeEditor";
 import CodeLinesDisplay from "../components/add-code-guides/codeLinesDisplay";
@@ -17,7 +17,8 @@ const CodeGuideEditor: React.FC = () => {
     tags: [],
     code_snippet: undefined,
     code_language: undefined,
-    category: undefined
+    category: undefined,
+    steps: []
   });
   const [steps, setSteps] = useState<Step[]>([]);
   const [selectedLines, setSelectedLines] = useState<LineSelection | null>(null);
@@ -85,6 +86,7 @@ const CodeGuideEditor: React.FC = () => {
     try {
       const guideToSave: Guide = {
         ...guide,
+        steps: steps,
         code_snippet: code
       };
 
@@ -97,22 +99,6 @@ const CodeGuideEditor: React.FC = () => {
         return;
       }
 
-      if (steps.length > 0 && guideResult.guideId) {
-        const stepsToSave = steps.map(step => ({
-          ...step,
-          guide_id: guideResult.guideId!
-        }));
-
-        console.log('Saving steps:', stepsToSave);
-        
-        const stepsResult = await saveSteps(stepsToSave);
-        
-        if (!stepsResult.success) {
-          alert(`Guide saved but failed to save steps: ${stepsResult.message}`);
-          return;
-        }
-      }
-
       alert('Guide and steps saved successfully!');
       
       setGuide({
@@ -121,7 +107,8 @@ const CodeGuideEditor: React.FC = () => {
         tags: [],
         code_snippet: undefined,
         code_language: undefined,
-        category: undefined
+        category: undefined,
+        steps: []
       });
       setSteps([]);
       setCode('');

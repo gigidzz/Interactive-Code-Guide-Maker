@@ -1,3 +1,5 @@
+import type { User } from ".";
+
 export interface CodeGuide {
   id?: string;
   created_at?: string;
@@ -8,6 +10,8 @@ export interface CodeGuide {
   code_snippet: string;
   code_language?: string;
   category?: string;
+  steps?: Step[];
+  author: User
 }
 
 export interface CodeGuideResponse {
@@ -50,6 +54,7 @@ export interface Guide {
   code_snippet?: string;
   code_language?: string;
   category?: string;
+  steps?: Step[]
 }
 
 export interface LineSelection {
