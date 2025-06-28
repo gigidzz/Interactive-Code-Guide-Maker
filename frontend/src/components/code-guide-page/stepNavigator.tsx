@@ -5,7 +5,7 @@ import type { Step } from '../../types/codeGuides';
 interface StepNavigatorProps {
   steps: Step[];
   currentStep: number;
-  onStepChange: (stepNumber: number) => void;
+  onStepChange: (step_number: number) => void;
 }
 
 const StepNavigator: React.FC<StepNavigatorProps> = ({

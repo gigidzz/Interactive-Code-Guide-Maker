@@ -16,7 +16,7 @@ const CodeLinesDisplay: React.FC<CodeLinesDisplayProps> = ({
 
   const getStepForLine = (lineNumber: number): Step | undefined => {
     return steps.find(step => 
-      lineNumber >= step.startLine && lineNumber <= step.endLine
+      lineNumber >= step.start_line && lineNumber <= step.end_line
     );
   };
 
