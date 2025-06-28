@@ -10,6 +10,7 @@ import CodeGuidePage from './pages/CodeGuidePage';
 import ProtectedRoute from './components/protectedRoute';
 import PublicRoute from './components/publicRoute';
 import { AuthorCodeGuides } from './pages/AuthorCodeGuides';
+import MyCodeUploadsPage from './pages/MyCodes';
 
 function App() {
   return (
@@ -44,6 +45,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CodeGuideEditor />
+                </ProtectedRoute>
+              } 
+            />
+
+             <Route 
+              path="/my-guides" 
+              element={
+                <ProtectedRoute>
+                  <MyCodeUploadsPage />
                 </ProtectedRoute>
               } 
             />

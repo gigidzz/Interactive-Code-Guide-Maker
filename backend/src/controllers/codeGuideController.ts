@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { CodeGuideService } from '../services/codeGuideService';
 import { UUID } from 'crypto';
 import { CreateGuideRequest, UpdateGuideRequest } from '../types';
+import supabase from '../config/supabase';
 
 export class CodeGuideController {
   static async getGuides(req: Request, res: Response) {
@@ -52,6 +53,47 @@ export class CodeGuideController {
     static async getGuideByAuthorId(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      const guide = await CodeGuideService.getGuideByAuthorId(id);
+
+      res.json({
+        success: true,
+        data: guide
+      });
+    } catch (error) {
+      res.status(404).json({
+        success: false,
+        message: 'Guide not found',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+      static async getMyGuides(req: Request, res: Response) {
+    try {
+      const authHeader = req.headers.authorization;
+          const token = authHeader?.split(' ')[1];
+      
+          if (!token) {
+            res.status(401).json({
+              success: false,
+              message: 'Access token required',
+              error: 'MISSING_TOKEN'
+            });
+            return;
+          }
+      
+          const { data: { user }, error } = await supabase.auth.getUser(token);
+      
+          if (error || !user) {
+            res.status(401).json({
+              success: false,
+              message: 'Invalid or expired token',
+              error: 'INVALID_TOKEN'
+            });
+            return;
+          }
+
+      const id = user.id
       const guide = await CodeGuideService.getGuideByAuthorId(id);
 
       res.json({

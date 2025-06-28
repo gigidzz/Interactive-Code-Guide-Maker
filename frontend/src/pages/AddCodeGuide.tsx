@@ -44,6 +44,7 @@ const CodeGuideEditor: React.FC = () => {
     if (!selectedLines) return;
 
     const step: Step = {
+      id: `${steps.length}`,
       guide_id: '',
       step_number: steps.length + 1,
       title,
@@ -56,7 +57,7 @@ const CodeGuideEditor: React.FC = () => {
     setSelectedLines(null);
   };
 
-  const handleRemoveStep = (stepId: string): void => {
+  const handleRemoveStep = (stepId: string | undefined): void => {
     setSteps(prev => 
       prev.filter(step => step.id !== stepId)
         .map((step, index) => ({ ...step, step_number: index + 1 }))

@@ -14,7 +14,7 @@ const CodeLine: React.FC<CodeLineProps> = ({ line, lineNumber, isSelected, step,
       <code className="text-slate-200 font-mono text-sm">{line || ' '}</code>
       {step && (
         <span className="ml-2 px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded">
-          Step {step.stepNumber}
+          Step {step.step_number}
         </span>
       )}
     </div>

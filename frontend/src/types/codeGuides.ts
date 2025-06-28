@@ -36,7 +36,7 @@ export interface CodeGuidesGridProps {
 }
 
 export interface Step {
-  id?: string;
+  id: string;
   guide_id: string;
   step_number: number;
   title: string;

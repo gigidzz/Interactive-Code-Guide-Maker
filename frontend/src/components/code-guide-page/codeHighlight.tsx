@@ -4,8 +4,8 @@ interface CodeHighlightProps {
   code: string;
   language?: string;
   highlightedLines?: number[];
-  startLine?: number;
-  endLine?: number;
+  start_line?: number;
+  end_line?: number;
 }
 
 export interface CodeHighlightRef {
@@ -16,13 +16,13 @@ const CodeHighlight = forwardRef<CodeHighlightRef, CodeHighlightProps>(({
   code,
   language = 'javascript',
   highlightedLines = [],
-  startLine,
-  endLine
+  start_line,
+  end_line
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const lines = code.split('\n');
-  const displayLines = startLine && endLine 
-    ? lines.slice(startLine - 1, endLine)
+  const displayLines = start_line && end_line 
+    ? lines.slice(start_line - 1, end_line)
     : lines;
 
   useImperativeHandle(ref, () => ({
@@ -67,7 +67,7 @@ const CodeHighlight = forwardRef<CodeHighlightRef, CodeHighlightProps>(({
   };
 
   const isLineHighlighted = (lineIndex: number) => {
-    const actualLineNumber = startLine ? startLine + lineIndex : lineIndex + 1;
+    const actualLineNumber = start_line ? start_line + lineIndex : lineIndex + 1;
     return highlightedLines.includes(actualLineNumber);
   };
 
@@ -98,7 +98,7 @@ const CodeHighlight = forwardRef<CodeHighlightRef, CodeHighlightProps>(({
       >
         <div className="w-max">
           {displayLines.map((line, index) => {
-            const lineNumber = startLine ? startLine + index : index + 1;
+            const lineNumber = start_line ? start_line + index : index + 1;
             const isHighlighted = isLineHighlighted(index);
             
             return (
