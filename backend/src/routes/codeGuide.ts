@@ -8,6 +8,7 @@ const router = Router();
 router.get('/guides', CodeGuideController.getGuides);
 router.get('/guides/:id', CodeGuideController.getGuideById);
 router.get('/guides/author/:id', CodeGuideController.getGuideByAuthorId);
+router.get('/my-guides', authenticateToken, CodeGuideController.getMyGuides);
 router.post('/guides', authenticateToken, validateGuideWithSteps, CodeGuideController.createGuide);
 router.put('/guides/:id', authenticateToken, validateGuideWithSteps, CodeGuideController.updateGuide);
 router.delete('/guides/:id', authenticateToken, CodeGuideController.deleteGuide);
