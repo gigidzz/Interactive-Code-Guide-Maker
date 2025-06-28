@@ -1,25 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCodeGuideWithSteps } from '../api/codeGuides';
+import { getCodeGuideById } from '../api/codeGuides';
 import CodeHighlight from '../components/code-guide-page/codeHighlight';
 import StepNavigator from '../components/code-guide-page/stepNavigator';
 import GuideHeader from '../components/code-guide-page/guideHeader';
-import LoadingSpinner from '../components/loadingSpinner';
 import ErrorDisplay from '../components/errorDisplay';
-import type { CodeGuide, Step } from '../types/codeGuides';
+import type { CodeGuide } from '../types/codeGuides';
+import { CodeGuidePageSkeleton } from '../components/skeletons/codeGuidePageSkeleton';
 
-const CodeGuidePage: React.FC = () => {
+const CodeGuidePageContent: React.FC = () => {
   const { 'guide-id': guideId } = useParams<{ 'guide-id': string }>();
   
   const [guide, setGuide] = useState<CodeGuide | null>(null);
-  const [steps, setSteps] = useState<Step[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   
   const codeHighlightRef = useRef<{ scrollToHighlight: () => void } | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!guideId) {
       setError('Guide ID not found in URL');
       setLoading(false);
@@ -29,32 +28,30 @@ const CodeGuidePage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getCodeGuideWithSteps(guideId);
-      setGuide(data.guide);
-      setSteps(data.steps);
-      if (data.steps.length > 0) {
-        setCurrentStep(1);
-      }
+      const data = await getCodeGuideById(guideId);
+      setGuide(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load code guide');
     } finally {
       setLoading(false);
     }
-  };
+  }, [guideId]);
 
   useEffect(() => {
     fetchData();
-  }, [guideId]);
+  }, [fetchData]);
 
-  const handleStepChange = (stepNumber: number) => {
+  const handleStepChange = useCallback((stepNumber: number) => {
     setCurrentStep(stepNumber);
     setTimeout(() => {
       codeHighlightRef.current?.scrollToHighlight();
     }, 100);
-  };
+  }, []);
 
-  const getCurrentHighlightedLines = () => {
-    const currentStepData = steps.find(step => step.step_number === currentStep);
+  const getCurrentHighlightedLines = useCallback(() => {
+    if (!guide?.steps) return [];
+    
+    const currentStepData = guide.steps.find(step => step.step_number === currentStep);
     if (!currentStepData) return [];
     
     const lines = [];
@@ -62,17 +59,19 @@ const CodeGuidePage: React.FC = () => {
       lines.push(i);
     }
     return lines;
-  };
+  }, [guide?.steps, currentStep]);
 
   if (loading) {
-    return (
-      <LoadingSpinner/>
-    );
+    return <CodeGuidePageSkeleton />;
   }
 
   if (error) {
     return (
-      <ErrorDisplay error={error} onRetry={fetchData}/>
+      <div className="min-h-screen bg-slate-950 p-6">
+        <div className="max-w-7xl mx-auto">
+          <ErrorDisplay error={error} onRetry={fetchData} />
+        </div>
+      </div>
     );
   }
 
@@ -105,9 +104,9 @@ const CodeGuidePage: React.FC = () => {
 
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-              {steps.length > 0 ? (
+              {guide.steps && guide.steps.length > 0 ? (
                 <StepNavigator
-                  steps={steps}
+                  steps={guide.steps}
                   currentStep={currentStep}
                   onStepChange={handleStepChange}
                 />
@@ -126,6 +125,14 @@ const CodeGuidePage: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const CodeGuidePage: React.FC = () => {
+  return (
+    <Suspense fallback={<CodeGuidePageSkeleton />}>
+      <CodeGuidePageContent />
+    </Suspense>
   );
 };
 

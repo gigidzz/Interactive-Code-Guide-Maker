@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-}
+import type { User } from '../types';
 
 interface UserCardProps {
   user: User;
@@ -16,18 +11,17 @@ const UserCard: React.FC<UserCardProps> = ({ user, onLogout }) => {
     <div className="relative group">
       <div className="flex items-center space-x-3 cursor-pointer">
         <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-          {user.username?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+          {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
         </div>
         <div className="hidden md:block">
-          <div className="text-sm font-medium text-gray-800">{user.username}</div>
+          <div className="text-sm font-medium text-purple-800">{user.name}</div>
           <div className="text-xs text-gray-500">{user.email}</div>
         </div>
       </div>
       
-      {/* Dropdown menu on hover */}
       <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="p-4 border-b border-gray-200">
-          <div className="text-sm font-medium text-gray-800">{user.username}</div>
+          <div className="text-sm font-medium text-purple-800">{user.name}</div>
           <div className="text-xs text-gray-500">{user.email}</div>
         </div>
         {onLogout && (

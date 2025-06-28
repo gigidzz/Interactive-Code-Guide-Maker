@@ -1,14 +1,15 @@
 import { Router } from 'express';
 import { CodeGuideController } from '../controllers/codeGuideController';
 import { authenticateToken } from '../middleware/auth';
-import { validateGuide, validateStep } from '../middleware/validation';
+import { validateGuideWithSteps, validateStep } from '../middleware/validation';
 
 const router = Router();
 
 router.get('/guides', CodeGuideController.getGuides);
 router.get('/guides/:id', CodeGuideController.getGuideById);
-router.post('/guides', authenticateToken, validateGuide, CodeGuideController.createGuide);
-router.put('/guides/:id', authenticateToken, validateGuide, CodeGuideController.updateGuide);
+router.get('/guides/author/:id', CodeGuideController.getGuideByAuthorId);
+router.post('/guides', authenticateToken, validateGuideWithSteps, CodeGuideController.createGuide);
+router.put('/guides/:id', authenticateToken, validateGuideWithSteps, CodeGuideController.updateGuide);
 router.delete('/guides/:id', authenticateToken, CodeGuideController.deleteGuide);
 
 router.get('/guides/:guideId/steps', CodeGuideController.getStepsByGuideId);
