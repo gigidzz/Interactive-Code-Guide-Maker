@@ -1,55 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { User, BookOpen, Code, Calendar, MapPin } from 'lucide-react';
 import { CodeGuideCard } from '../components/home-page/CodeGuideCard';
 import { getCodeGuideByAuthorId } from '../api/codeGuides';
 import type { CodeGuide } from '../types/codeGuides';
+import { AuthorCodeGuidesSkeleton } from '../components/skeletons/authorCodeGuideSkeleton';
 
-export const AuthorCodeGuides: React.FC = () => {
+const AuthorCodeGuidesContent: React.FC = () => {
   const { 'author-id': authorId } = useParams<{ 'author-id': string }>();
   const [codeGuides, setCodeGuides] = useState<CodeGuide[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [author, setAuthor] = useState<CodeGuide['author'] | null>(null);
 
-  useEffect(() => {
-    const fetchCodeGuides = async () => {
-      if (!authorId) {
-        setError('Author ID not provided');
-        setLoading(false);
-        return;
-      }
+  const fetchCodeGuides = useCallback(async () => {
+    if (!authorId) {
+      setError('Author ID not provided');
+      setLoading(false);
+      return;
+    }
 
-      try {
-        setLoading(true);
-        setError(null);
-        const guides = await getCodeGuideByAuthorId(authorId);
-        setCodeGuides(guides);
-        
-        // Extract author info from the first guide (assuming all guides have the same author)
-        if (guides.length > 0 && guides[0].author) {
-          setAuthor(guides[0].author);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch code guides');
-        console.error('Error fetching code guides:', err);
-      } finally {
-        setLoading(false);
+    try {
+      setLoading(true);
+      setError(null);
+      const guides = await getCodeGuideByAuthorId(authorId);
+      setCodeGuides(guides);
+      
+      if (guides.length > 0 && guides[0].author) {
+        setAuthor(guides[0].author);
       }
-    };
-
-    fetchCodeGuides();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch code guides');
+      console.error('Error fetching code guides:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [authorId]);
 
+  useEffect(() => {
+    fetchCodeGuides();
+  }, [fetchCodeGuides]); 
+
+  const stats = React.useMemo(() => ({
+    totalGuides: codeGuides.length,
+    uniqueLanguages: new Set(codeGuides.map(g => g.code_language).filter(Boolean)).size,
+    uniqueCategories: new Set(codeGuides.map(g => g.category).filter(Boolean)).size,
+  }), [codeGuides]);
+
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-slate-300">Loading code guides...</p>
-        </div>
-      </div>
-    );
+    return <AuthorCodeGuidesSkeleton />;
   }
 
   if (error) {
@@ -58,7 +57,13 @@ export const AuthorCodeGuides: React.FC = () => {
         <div className="text-center bg-slate-800 p-8 rounded-xl border border-red-500/20">
           <div className="text-red-400 text-5xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold text-slate-100 mb-2">Error Loading Code Guides</h2>
-          <p className="text-slate-300">{error}</p>
+          <p className="text-slate-300 mb-4">{error}</p>
+          <button
+            onClick={fetchCodeGuides}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -67,7 +72,6 @@ export const AuthorCodeGuides: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="container mx-auto px-4 py-8">
-        {/* Author Header */}
         {author && (
           <div className="bg-slate-800 rounded-2xl shadow-2xl border border-purple-500/20 p-8 mb-8">
             <div className="flex items-start gap-6">
@@ -100,8 +104,8 @@ export const AuthorCodeGuides: React.FC = () => {
                 <div className="flex items-center gap-6 text-sm text-slate-400">
                   <div className="flex items-center">
                     <BookOpen className="w-4 h-4 mr-2" />
-                    <span className="font-medium">{codeGuides.length}</span>
-                    <span className="ml-1">Code Guide{codeGuides.length !== 1 ? 's' : ''}</span>
+                    <span className="font-medium">{stats.totalGuides}</span>
+                    <span className="ml-1">Code Guide{stats.totalGuides !== 1 ? 's' : ''}</span>
                   </div>
                   <div className="flex items-center">
                     <Code className="w-4 h-4 mr-2" />
@@ -113,7 +117,6 @@ export const AuthorCodeGuides: React.FC = () => {
           </div>
         )}
 
-        {/* Code Guides Section */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-6">
             <BookOpen className="w-6 h-6 text-purple-400" />
@@ -121,7 +124,7 @@ export const AuthorCodeGuides: React.FC = () => {
               {author ? `${author.name}'s Code Guides` : 'Code Guides'}
             </h2>
             <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-              {codeGuides.length}
+              {stats.totalGuides}
             </span>
           </div>
 
@@ -142,7 +145,6 @@ export const AuthorCodeGuides: React.FC = () => {
           )}
         </div>
 
-        {/* Stats Section */}
         {codeGuides.length > 0 && (
           <div className="bg-slate-800 rounded-2xl shadow-2xl border border-purple-500/20 p-6">
             <h3 className="text-lg font-bold text-slate-100 mb-4 flex items-center gap-2">
@@ -152,21 +154,17 @@ export const AuthorCodeGuides: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-slate-700 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-purple-400 mb-1">{codeGuides.length}</div>
+                <div className="text-2xl font-bold text-purple-400 mb-1">{stats.totalGuides}</div>
                 <div className="text-sm text-slate-300">Total Guides</div>
               </div>
               
               <div className="bg-slate-700 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-purple-400 mb-1">
-                  {new Set(codeGuides.map(g => g.code_language).filter(Boolean)).size}
-                </div>
+                <div className="text-2xl font-bold text-purple-400 mb-1">{stats.uniqueLanguages}</div>
                 <div className="text-sm text-slate-300">Languages Used</div>
               </div>
               
               <div className="bg-slate-700 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-purple-400 mb-1">
-                  {new Set(codeGuides.map(g => g.category).filter(Boolean)).size}
-                </div>
+                <div className="text-2xl font-bold text-purple-400 mb-1">{stats.uniqueCategories}</div>
                 <div className="text-sm text-slate-300">Categories</div>
               </div>
             </div>
@@ -174,5 +172,13 @@ export const AuthorCodeGuides: React.FC = () => {
         )}
       </div>
     </div>
+  );
+};
+
+export const AuthorCodeGuides: React.FC = () => {
+  return (
+    <Suspense fallback={<AuthorCodeGuidesSkeleton />}>
+      <AuthorCodeGuidesContent />
+    </Suspense>
   );
 };

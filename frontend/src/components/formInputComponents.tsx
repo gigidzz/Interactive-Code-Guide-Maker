@@ -5,7 +5,7 @@ export const FormInput: React.FC<FormInputProps> = ({
   id, name, type, label, value, placeholder, error, required, autoComplete, onChange
 }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+    <label htmlFor={id} className="block text-sm font-medium text-purple-700">
       {label}
     </label>
     <div className="mt-1">

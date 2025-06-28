@@ -48,7 +48,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
       console.log('Fetching user data...');
 
-      const response = await fetch('http://localhost:5000/api/auth/user/me', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/user/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
