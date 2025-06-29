@@ -127,8 +127,8 @@ export class CodeGuideService {
           step_number: step.step_number,
           title: step.title,
           description: step.description,
-          start_line: 1,
-          end_line: 2,
+          start_line: step.start_line,
+          end_line: step.end_line,
           guide_id: createdGuide.id as UUID
         }));
 
