@@ -124,8 +124,12 @@ export class CodeGuideService {
 
       if (guideRequest.steps && guideRequest.steps.length > 0) {
         const stepsData = guideRequest.steps.map(step => ({
-          ...step,
-          guide_id: createdGuide.id
+          step_number: step.step_number,
+          title: step.title,
+          description: step.description,
+          start_line: 1,
+          end_line: 2,
+          guide_id: createdGuide.id as UUID
         }));
 
         const { data: createdSteps, error: stepsError } = await userSupabase
